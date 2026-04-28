@@ -1,0 +1,28 @@
+/* ========== Base ========== */
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap");
+@import "@/styles/typography.css";
+@import "tailwindcss";
+
+/* ========== Custom Fonts ========== */
+@font-face {
+  font-family: "Carmine";
+  src: url("/fonts/Carmine.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ========== Theme Tokens ========== */
+@theme inline {
+  --font-carmine: "Carmine", ui-sans-serif, system-ui;
+  --font-sans: "Montserrat", ui-sans-serif, system-ui;
+}
+
+/* ========== Utilities ========== */
+@utility font-carmine {
+  font-family: var(--font-carmine);
+}
+
+@utility font-montserrat {
+  font-family: var(--font-sans);
+}

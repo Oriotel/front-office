@@ -1,12 +1,27 @@
+@theme {
+  --color-brand-blue: #1428C9;
+  --color-brand-white: #F9FAFB;
+  --color-brand-slate: #111827;
+}
+
 /* ========== Base ========== */
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap");
-@import "@/styles/typography.css";
+@import "./styles/style.css";
 @import "tailwindcss";
 
-/* ========== Custom Fonts ========== */
+:root {
+  --brand-blue: #1428C9;
+  --brand-white: #F9FAFB;
+  --brand-slate: #111827;
+}
+
+body {
+  background-color: var(--brand-white);
+  color: var(--brand-slate);
+}
 @font-face {
   font-family: "Carmine";
-  src: url("/fonts/Carmine.ttf") format("truetype");
+  src: url("/fonts/font.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;

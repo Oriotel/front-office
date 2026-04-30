@@ -10,7 +10,6 @@ const MOCK_USERS = [
     email: 'karim.sami@oriotel.com',
     telephone: '0661234567',
     role: 'Administrateur',
-    type: 'Interne',
     statut: 'Actif',
     dateCreation: '2024-01-15',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Karim',
@@ -26,7 +25,6 @@ const MOCK_USERS = [
     email: 'sara.alami@external.com',
     telephone: '0667654321',
     role: 'Assistant',
-    type: 'Externe',
     statut: 'Inactif',
     dateCreation: '2024-02-10',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sara',
@@ -42,13 +40,117 @@ const MOCK_USERS = [
     email: 'omar.bennani@oriotel.com',
     telephone: '0660000001',
     role: 'Animateur',
-    type: 'Interne',
     statut: 'Suspendu',
     dateCreation: '2024-03-05',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Omar',
     cin: 'EF345678',
     adresse: 'Marrakech, Maroc',
     dateNaissance: '1985-03-25',
+  },
+  {
+    id: 4,
+    identifiant: 'USR004',
+    nom: 'Tazi',
+    prenom: 'Laila',
+    email: 'laila.tazi@oriotel.com',
+    telephone: '0660000004',
+    role: 'Assistant',
+    statut: 'Actif',
+    dateCreation: '2024-03-12',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Laila',
+    cin: 'GH901234',
+    adresse: 'Tanger, Maroc',
+    dateNaissance: '1992-07-14',
+  },
+  {
+    id: 5,
+    identifiant: 'USR005',
+    nom: 'Mansouri',
+    prenom: 'Youssef',
+    email: 'youssef.mans@oriotel.com',
+    telephone: '0660000005',
+    role: 'Superviseur',
+    statut: 'Actif',
+    dateCreation: '2024-03-15',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Youssef',
+    cin: 'IJ567890',
+    adresse: 'Agadir, Maroc',
+    dateNaissance: '1988-11-30',
+  },
+  {
+    id: 6,
+    identifiant: 'USR006',
+    nom: 'Chraibi',
+    prenom: 'Anas',
+    email: 'anas.chraibi@oriotel.com',
+    telephone: '0660000006',
+    role: 'Animateur',
+    statut: 'Actif',
+    dateCreation: '2024-03-20',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Anas',
+    cin: 'KL123456',
+    adresse: 'Fès, Maroc',
+    dateNaissance: '1994-04-05',
+  },
+  {
+    id: 7,
+    identifiant: 'USR007',
+    nom: 'Idrissi',
+    prenom: 'Meryem',
+    email: 'meryem.id@oriotel.com',
+    telephone: '0660000007',
+    role: 'Assistant',
+    statut: 'Inactif',
+    dateCreation: '2024-03-22',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Meryem',
+    cin: 'MN789012',
+    adresse: 'Meknès, Maroc',
+    dateNaissance: '1996-09-18',
+  },
+  {
+    id: 8,
+    identifiant: 'USR008',
+    nom: 'Zouhair',
+    prenom: 'Hamza',
+    email: 'hamza.z@oriotel.com',
+    telephone: '0660000008',
+    role: 'Administrateur',
+    statut: 'Actif',
+    dateCreation: '2024-03-25',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Hamza',
+    cin: 'OP345678',
+    adresse: 'Casablanca, Maroc',
+    dateNaissance: '1987-01-22',
+  },
+  {
+    id: 9,
+    identifiant: 'USR009',
+    nom: 'Filali',
+    prenom: 'Salma',
+    email: 'salma.f@oriotel.com',
+    telephone: '0660000009',
+    role: 'Superviseur',
+    statut: 'Suspendu',
+    dateCreation: '2024-03-28',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Salma',
+    cin: 'QR901234',
+    adresse: 'Rabat, Maroc',
+    dateNaissance: '1991-12-08',
+  },
+  {
+    id: 10,
+    identifiant: 'USR010',
+    nom: 'Sabiri',
+    prenom: 'Driss',
+    email: 'driss.s@oriotel.com',
+    telephone: '0660000010',
+    role: 'Animateur',
+    statut: 'Actif',
+    dateCreation: '2024-03-30',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Driss',
+    cin: 'ST567890',
+    adresse: 'El Jadida, Maroc',
+    dateNaissance: '1989-06-15',
   },
 ];
 
@@ -57,8 +159,8 @@ export const useUsers = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     role: '',
-    type: '',
     statut: '',
+    dateCreation: '',
   });
 
   const filteredUsers = useMemo(() => {
@@ -70,10 +172,10 @@ export const useUsers = () => {
         user.email.toLowerCase().includes(searchQuery.toLowerCase());
       
       const matchesRole = !filters.role || user.role === filters.role;
-      const matchesType = !filters.type || user.type === filters.type;
       const matchesStatus = !filters.statut || user.statut === filters.statut;
+      const matchesDate = !filters.dateCreation || user.dateCreation === filters.dateCreation;
 
-      return matchesSearch && matchesRole && matchesType && matchesStatus;
+      return matchesSearch && matchesRole && matchesStatus && matchesDate;
     });
   }, [users, searchQuery, filters]);
 

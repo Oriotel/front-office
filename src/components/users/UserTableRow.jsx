@@ -1,56 +1,77 @@
-import { Eye, Pencil, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Eye, Pencil } from 'lucide-react';
 import Badge from '../common/Badge';
 import Button from '../common/Button';
 import { cn } from '../../utils/cn';
 import { ROLE_STYLES, STATUS_STYLES } from '../../constants/users';
 
-const UserTableRow = ({ user, onEdit, onToggleStatus, onView }) => {
+const UserTableRow = ({ user, onEdit, onView }) => {
   return (
-    <tr className="hover:bg-[#F0F3FF]/30 transition-colors group">
+    <tr className="hover:bg-[#F0F3FF]/50 hover:scale-[1.01] hover:shadow-xl hover:z-10 transition-all duration-300 ease-in-out group border-b border-gray-50 last:border-0 relative animate-in fade-in slide-in-up">
+      {/* 1. Photo */}
       <td className="px-6 py-4">
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <img src={user.avatar} alt="" className="w-11 h-11 rounded-xl border border-gray-100 bg-white object-cover" />
-            <div className={cn(
-              "absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white",
-              user.statut === 'Actif' ? "bg-green-500" : "bg-gray-300"
-            )} />
-          </div>
-          <div>
-            <p className="text-sm font-bold text-[#111827] leading-tight">{user.prenom} {user.nom}</p>
-            <p className="text-xs text-gray-400 mt-1">{user.email}</p>
-          </div>
+        <div className="relative w-10 h-10">
+          <img src={user.avatar} alt="" className="w-10 h-10 rounded-xl border border-gray-100 bg-white object-cover shadow-sm group-hover:shadow-md transition-all duration-300" />
+          <div className={cn(
+            "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm",
+            user.statut === 'Actif' ? "bg-green-500" : "bg-gray-300"
+          )} />
         </div>
       </td>
+
+      {/* 2. Nom & Prénom */}
       <td className="px-6 py-4">
-        <span className="text-xs font-bold text-[#1428C9] bg-[#F0F3FF] px-2.5 py-1 rounded-lg border border-[#1428C9]/5">{user.identifiant}</span>
+        <p className="text-sm font-bold text-[#111827] whitespace-nowrap transition-colors group-hover:text-[#1428C9]">{user.prenom} {user.nom}</p>
       </td>
+
+      {/* 3. Identifiant */}
       <td className="px-6 py-4">
-        <p className="text-sm font-medium text-[#111827]">{user.telephone}</p>
-        <p className="text-[11px] text-gray-400 mt-1 font-medium italic">Créé le {user.dateCreation}</p>
+        <span className="text-[10px] font-bold text-[#1428C9] bg-[#F0F3FF] px-2.5 py-1 rounded-lg border border-[#1428C9]/10 whitespace-nowrap shadow-sm group-hover:shadow-blue-900/10 transition-all duration-300">
+          {user.identifiant}
+        </span>
       </td>
+
+      {/* 4. Email */}
       <td className="px-6 py-4">
-        <div className="flex flex-col gap-2 items-start">
-          <Badge className={ROLE_STYLES[user.role]}>{user.role}</Badge>
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">{user.type}</span>
-        </div>
+        <p className="text-xs text-gray-500 font-medium truncate max-w-[150px] group-hover:text-gray-700 transition-colors duration-200" title={user.email}>
+          {user.email}
+        </p>
       </td>
+
+      {/* 5. Téléphone */}
       <td className="px-6 py-4">
-        <Badge className={STATUS_STYLES[user.statut]}>{user.statut}</Badge>
+        <p className="text-xs font-bold text-[#111827] whitespace-nowrap">{user.telephone}</p>
       </td>
-      <td className="px-6 py-4 text-right">
-        <div className="flex items-center justify-end gap-1">
-          <Button variant="ghost" size="sm" onClick={() => onView(user)} title="Voir le profil" icon={Eye} />
-          <Button variant="ghost" size="sm" onClick={() => onEdit(user)} title="Modifier" icon={Pencil} className="hover:text-orange-600 hover:bg-orange-50" />
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => onToggleStatus(user)} 
-            title="Changer statut"
-            className={user.statut === 'Actif' ? "text-green-500 hover:bg-green-50" : ""}
-          >
-            {user.statut === 'Actif' ? <ToggleRight size={22} /> : <ToggleLeft size={22} />}
-          </Button>
+
+      {/* 6. CIN / ID */}
+      <td className="px-6 py-4">
+        <p className="text-xs font-medium text-gray-500 whitespace-nowrap">{user.cin || '-'}</p>
+      </td>
+
+      {/* 7. Rôle */}
+      <td className="px-6 py-4">
+        <Badge className={cn("whitespace-nowrap shadow-sm group-hover:shadow-md transition-all duration-300", ROLE_STYLES[user.role])}>{user.role}</Badge>
+      </td>
+
+      {/* 8. Date Naiss. */}
+      <td className="px-6 py-4 text-center">
+        <p className="text-xs text-gray-500 font-medium whitespace-nowrap">{user.dateNaissance || '-'}</p>
+      </td>
+
+      {/* 9. Création */}
+      <td className="px-6 py-4">
+        <p className="text-[11px] text-gray-400 font-medium italic whitespace-nowrap">{user.dateCreation}</p>
+      </td>
+
+      {/* 10. Statut */}
+      <td className="px-6 py-4">
+        <Badge className={cn("whitespace-nowrap shadow-sm group-hover:shadow-md transition-all duration-300", STATUS_STYLES[user.statut])}>{user.statut}</Badge>
+      </td>
+
+      {/* 11. Actions */}
+      <td className="px-6 py-4 text-right pr-8">
+        <div className="flex items-center justify-end gap-1 transition-all duration-300">
+          <Button variant="ghost" size="sm" onClick={() => onView(user)} title="Voir le profil" icon={Eye} className="text-gray-400 hover:text-[#1428C9] hover:bg-[#F0F3FF]" />
+          <Button variant="ghost" size="sm" onClick={() => onEdit(user)} title="Modifier" icon={Pencil} className="text-gray-400 hover:text-orange-600 hover:bg-orange-50" />
         </div>
       </td>
     </tr>

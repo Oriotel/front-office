@@ -4,7 +4,7 @@ import UserTableRow from './UserTableRow';
 import UserCard from './UserCard';
 import Button from '../common/Button';
 
-const UserTable = ({ users, onEdit, onToggleStatus, onView }) => {
+const UserTable = ({ users, onEdit, onView }) => {
   if (users.length === 0) {
     return (
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 mt-8 text-center">
@@ -18,12 +18,11 @@ const UserTable = ({ users, onEdit, onToggleStatus, onView }) => {
       {/* Mobile/Tablet View (Cards) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:hidden gap-4">
         {users.map((user) => (
-          <UserCard 
-            key={user.id} 
-            user={user} 
-            onEdit={onEdit} 
-            onToggleStatus={onToggleStatus} 
-            onView={onView} 
+          <UserCard
+            key={user.id}
+            user={user}
+            onEdit={onEdit}
+            onView={onView}
           />
         ))}
       </div>
@@ -35,12 +34,11 @@ const UserTable = ({ users, onEdit, onToggleStatus, onView }) => {
             <UserTableHeader />
             <tbody className="divide-y divide-gray-50">
               {users.map((user) => (
-                <UserTableRow 
-                  key={user.id} 
-                  user={user} 
-                  onEdit={onEdit} 
-                  onToggleStatus={onToggleStatus} 
-                  onView={onView} 
+                <UserTableRow
+                  key={user.id}
+                  user={user}
+                  onEdit={onEdit}
+                  onView={onView}
                 />
               ))}
             </tbody>

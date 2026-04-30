@@ -11,11 +11,6 @@ export const USER_STATUS = {
   SUSPENDED: 'Suspendu',
 };
 
-export const CONTRACT_TYPES = {
-  INTERNAL: 'Interne',
-  EXTERNAL: 'Externe',
-};
-
 export const ROLE_STYLES = {
   [USER_ROLES.ADMIN]: 'bg-purple-50 text-purple-700 border-purple-100',
   [USER_ROLES.ASSISTANT]: 'bg-blue-50 text-blue-700 border-blue-100',

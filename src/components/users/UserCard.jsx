@@ -1,10 +1,10 @@
-import { Eye, Pencil, ToggleLeft, ToggleRight, Phone, Mail, Hash } from 'lucide-react';
+import { Eye, Pencil, Phone, Mail, Hash } from 'lucide-react';
 import Badge from '../common/Badge';
 import Button from '../common/Button';
 import { cn } from '../../utils/cn';
 import { ROLE_STYLES, STATUS_STYLES } from '../../constants/users';
 
-const UserCard = ({ user, onEdit, onToggleStatus, onView }) => {
+const UserCard = ({ user, onEdit, onView }) => {
   return (
     <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
       {/* Top Section: Avatar & Basic Info */}
@@ -49,41 +49,29 @@ const UserCard = ({ user, onEdit, onToggleStatus, onView }) => {
           </div>
           <div className="flex items-center gap-2">
             <Badge className={ROLE_STYLES[user.role]}>{user.role}</Badge>
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{user.type}</span>
           </div>
         </div>
       </div>
 
-      {/* Actions */}
+      {/* Actions — status is read-only, no toggle */}
       <div className="flex items-center gap-2 pt-4 border-t border-gray-50">
-        <Button 
-          variant="secondary" 
-          size="sm" 
-          onClick={() => onView(user)} 
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => onView(user)}
           className="flex-1 py-2.5"
           icon={Eye}
         >
           Voir
         </Button>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={() => onEdit(user)} 
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onEdit(user)}
           className="flex-1 py-2.5"
           icon={Pencil}
         >
           Éditer
-        </Button>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => onToggleStatus(user)} 
-          className={cn(
-            "p-2.5 rounded-xl transition-all",
-            user.statut === 'Actif' ? "text-green-500 bg-green-50" : "text-gray-400 bg-gray-50"
-          )}
-        >
-          {user.statut === 'Actif' ? <ToggleRight size={22} /> : <ToggleLeft size={22} />}
         </Button>
       </div>
     </div>

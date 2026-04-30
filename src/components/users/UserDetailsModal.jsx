@@ -22,7 +22,6 @@ const UserDetailsModal = ({ isOpen, onClose, user }) => {
       items: [
         { icon: CreditCard, label: 'CIN / Identité', value: user.cin || 'Non renseigné' },
         { icon: Shield, label: 'Rôle', value: user.role },
-        { icon: Shield, label: 'Type de contrat', value: user.type },
         { icon: Calendar, label: 'Date de création', value: user.dateCreation },
       ]
     }

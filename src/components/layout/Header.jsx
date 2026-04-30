@@ -1,5 +1,7 @@
-import { Bell, Search, User, Globe, ChevronRight } from 'lucide-react';
+import { Bell, Search, Globe, ChevronRight, Users, LogOut, ChevronDown } from 'lucide-react';
 import { useLocation, Link } from 'react-router-dom';
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import * as Avatar from "@radix-ui/react-avatar";
 import Button from '../common/Button';
 import Input from '../common/Input';
 
@@ -14,23 +16,23 @@ const Header = () => {
   };
 
   return (
-    <header className="min-h-[4rem] py-3 lg:py-0 bg-white border-b border-gray-100 sticky top-0 z-40 shadow-sm px-4 md:px-6 lg:px-8">
+    <header className="min-h-[4rem] py-3 lg:py-0 bg-white border-b border-gray-100 sticky top-0 z-40 px-4 md:px-6 lg:px-8">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:h-16">
         {/* Left: Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm font-medium overflow-x-auto whitespace-nowrap no-scrollbar py-1">
-          <Link to="/" className="text-gray-400 hover:text-[#1428C9] transition-colors shrink-0">Accueil</Link>
+        <nav className="flex items-center gap-3 text-sm font-medium overflow-x-auto whitespace-nowrap no-scrollbar py-1">
+          <Link to="/" className="text-gray-500 hover:text-[#1428C9] transition-all duration-200 shrink-0 font-semibold">Accueil</Link>
           {pathnames.map((value, index) => {
             const last = index === pathnames.length - 1;
             const to = `/${pathnames.slice(0, index + 1).join('/')}`;
             const name = breadcrumbMap[value] || value.charAt(0).toUpperCase() + value.slice(1);
 
             return (
-              <div key={to} className="flex items-center gap-2 shrink-0">
+              <div key={to} className="flex items-center gap-3 shrink-0 animate-in fade-in slide-in-right" style={{ animationDelay: `${index * 50}ms` }}>
                 <ChevronRight size={14} className="text-gray-300" />
                 {last ? (
                   <span className="font-bold text-[#111827]">{name}</span>
                 ) : (
-                  <Link to={to} className="text-gray-400 hover:text-[#1428C9] transition-colors">
+                  <Link to={to} className="text-gray-500 hover:text-[#1428C9] transition-all duration-200 font-semibold">
                     {name}
                   </Link>
                 )}
@@ -59,11 +61,58 @@ const Header = () => {
               <span>FR</span>
             </Button>
 
-            {/* Profile */}
+            {/* Profile Dropdown */}
             <div className="flex items-center pl-2 md:pl-4 border-l border-gray-100 ml-1 md:ml-0">
-              <div className="w-9 h-9 md:w-10 md:h-10 bg-white rounded-xl flex items-center justify-center text-gray-400 border border-gray-100 shadow-sm overflow-hidden cursor-pointer hover:border-[#1428C9]/30 transition-all">
-                <User size={20} className="md:size-22" />
-              </div>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger className="outline-none group">
+                  <div className="flex items-center gap-3 p-1 rounded-xl hover:bg-gray-50 transition-all cursor-pointer">
+                    <Avatar.Root className="flex-none">
+                      <Avatar.Image
+                        className="w-9 h-9 md:w-10 md:h-10 rounded-xl object-cover ring-2 ring-transparent group-hover:ring-[#1428C9]/10 transition-all"
+                        src="https://randomuser.me/api/portraits/women/79.jpg"
+                        alt="vienna"
+                      />
+                      <Avatar.Fallback
+                        className="flex w-9 h-9 md:w-10 md:h-10 rounded-xl items-center justify-center text-white text-xs font-bold bg-gradient-to-tr from-[#1428C9] to-blue-400"
+                      >
+                        AD
+                      </Avatar.Fallback>
+                    </Avatar.Root>
+                    <div className="hidden sm:block text-left">
+                      <p className="text-sm font-bold text-[#111827] leading-none">Admin Oriotel</p>
+                      <p className="text-[11px] text-gray-400 mt-1">Administrateur</p>
+                    </div>
+                    <ChevronDown size={14} className="text-gray-400 hidden sm:block" />
+                  </div>
+                </DropdownMenu.Trigger>
+
+                <DropdownMenu.Portal>
+                  <DropdownMenu.Content 
+                    className="z-[100] w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-300 cubic-bezier(0.4, 0, 0.2, 1)"
+                    sideOffset={12}
+                    align="end"
+                  >
+                    <div className="px-4 py-3 mb-1 border-b border-gray-50">
+                      <p className="text-sm font-bold text-[#111827] leading-none">Admin Oriotel</p>
+                      <p className="text-[11px] text-gray-500 mt-1.5 font-medium">admin@oriotel.com</p>
+                    </div>
+                    <div className="p-1">
+                      <DropdownMenu.Item className="outline-none">
+                        <Link to="/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-600 hover:bg-[#F0F3FF] hover:text-[#1428C9] transition-all duration-200">
+                          <Users size={18} />
+                          <span>Mon Profil</span>
+                        </Link>
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Item className="outline-none">
+                        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-red-600 hover:bg-red-50 transition-all duration-200">
+                          <LogOut size={18} />
+                          <span>Déconnexion</span>
+                        </button>
+                      </DropdownMenu.Item>
+                    </div>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Portal>
+              </DropdownMenu.Root>
             </div>
           </div>
         </div>

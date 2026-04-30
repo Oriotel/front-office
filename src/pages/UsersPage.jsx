@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import UserTable from '../components/users/UserTable';
 import UserFilters from '../components/users/UserFilters';
 import UserDrawer from '../components/users/UserDrawer';
-import ConfirmationModal from '../components/users/ConfirmationModal';
 import UserDetailsModal from '../components/users/UserDetailsModal';
 import { useUsers } from '../hooks/useUsers';
 
@@ -16,13 +15,17 @@ const UsersPage = () => {
     setFilters,
     addUser,
     updateUser,
-    toggleUserStatus,
   } = useUsers();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 1200);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleNewUser = () => {
     setSelectedUser(null);
@@ -39,25 +42,13 @@ const UsersPage = () => {
     setIsDetailsOpen(true);
   };
 
-  const handleToggleStatus = (user) => {
-    setSelectedUser(user);
-    setIsConfirmOpen(true);
-  };
-
-  const handleConfirmStatus = () => {
-    if (selectedUser) {
-      toggleUserStatus(selectedUser.id);
-    }
-    setIsConfirmOpen(false);
-  };
-
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
   const handleResetFilters = () => {
     setSearchQuery('');
-    setFilters({ role: '', type: '', statut: '' });
+    setFilters({ role: '', statut: '', dateCreation: '' });
   };
 
   const handleDrawerSubmit = (data) => {
@@ -69,23 +60,29 @@ const UsersPage = () => {
   };
 
   return (
-    <div className="w-full mx-auto animate-in fade-in duration-500 pb-12">
-      <UserFilters 
-        userCount={totalCount}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        filters={filters}
-        onFilterChange={handleFilterChange}
-        onReset={handleResetFilters}
-        onNewUser={handleNewUser}
-      />
+    <div className="w-full mx-auto pb-12 space-y-8">
+      {/* Filters section with staggered entry */}
+      <div className="animate-in fade-in slide-in-up duration-500">
+        <UserFilters 
+          userCount={totalCount}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onReset={handleResetFilters}
+          onNewUser={handleNewUser}
+        />
+      </div>
       
-      <UserTable 
-        users={users}
-        onEdit={handleEditUser}
-        onToggleStatus={handleToggleStatus}
-        onView={handleViewUser}
-      />
+      {/* Table section with slightly delayed entry */}
+      <div className="animate-in fade-in slide-in-up duration-700 delay-150">
+        <UserTable
+          users={users}
+          onEdit={handleEditUser}
+          onView={handleViewUser}
+          isLoading={isLoading}
+        />
+      </div>
 
       <UserDrawer 
         isOpen={isDrawerOpen}
@@ -98,16 +95,6 @@ const UsersPage = () => {
         isOpen={isDetailsOpen}
         onClose={() => setIsDetailsOpen(false)}
         user={selectedUser}
-      />
-
-      <ConfirmationModal 
-        isOpen={isConfirmOpen}
-        onClose={() => setIsConfirmOpen(false)}
-        onConfirm={handleConfirmStatus}
-        title="Changer le statut"
-        message={`Voulez-vous vraiment changer le statut de ${selectedUser?.prenom} ${selectedUser?.nom} ?`}
-        confirmText="Confirmer le changement"
-        type="warning"
       />
     </div>
   );

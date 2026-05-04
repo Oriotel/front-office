@@ -1,12 +1,12 @@
 import { useLocation, Link } from "react-router-dom";
-import { 
-  LayoutDashboard, 
-  Users, 
-  CreditCard, 
-  Folder, 
-  Box, 
-  MessageSquare, 
-  CheckSquare, 
+import {
+  LayoutDashboard,
+  Users,
+  CreditCard,
+  Folder,
+  Box,
+  MessageSquare,
+  CheckSquare,
   Clock,
   Settings,
   HelpCircle,
@@ -17,7 +17,7 @@ import { ChevronRight } from "lucide-react";
 const Sidebar = () => {
   const location = useLocation();
   const navigation = [
-    { name: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
+    { name: "Tableau de bord", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
     { name: "Utilisateurs", href: "/users", icon: <Users className="w-5 h-5" /> },
     { name: "Souscriptions", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> },
     { name: "Dossiers", href: "/dossiers", icon: <Folder className="w-5 h-5" /> },
@@ -28,25 +28,25 @@ const Sidebar = () => {
   ];
 
   const navsFooter = [
-    { name: "Help", href: "/help", icon: <HelpCircle className="w-5 h-5" /> },
-    { name: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },
+    { name: "Aide", href: "/help", icon: <HelpCircle className="w-5 h-5" /> },
+    { name: "Paramètres", href: "/settings", icon: <Settings className="w-5 h-5" /> },
   ];
 
   return (
-    <nav className="fixed top-0 left-0 w-20 h-full bg-white flex flex-col z-[50] -translate-x-[calc(100%-4px)] hover:translate-x-0 transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1) group/sidebar shadow-2xl">
+    <nav className="fixed top-0 left-0 w-20 h-full bg-white/95 backdrop-blur-lg border-r border-gray-100 flex flex-col z-[50] -translate-x-[calc(100%-4px)] hover:translate-x-0 transition-all duration-[1000ms] cubic-bezier(0.23, 1, 0.32, 1) delay-[400ms] group-hover:duration-700 group-hover:delay-150 group/sidebar">
       {/* Visual Indicator (Fleche) - Visible when hidden */}
-      <div className="absolute top-1/2 -right-8 -translate-y-1/2 w-8 h-14 bg-[#1428C9] flex items-center justify-center rounded-r-2xl shadow-xl shadow-blue-900/30 group-hover/sidebar:opacity-0 group-hover/sidebar:pointer-events-none transition-all duration-300 cursor-pointer">
+      <div className="absolute top-1/2 -right-8 -translate-y-1/2 w-8 h-14 bg-[#1428C9] flex items-center justify-center rounded-r-sm group-hover/sidebar:opacity-0 group-hover/sidebar:pointer-events-none transition-all duration-300 cursor-pointer">
         <ChevronRight size={20} className="text-white animate-bounce-horizontal" />
       </div>
 
       {/* Invisible trigger padding to make it easier to hover */}
       <div className="absolute top-0 -right-8 w-8 h-full" />
-      
-      <div className="flex flex-col h-full items-center justify-center relative">
-        
+
+      <div className="flex flex-col h-full items-center justify-start relative pt-24 opacity-0 -translate-x-4 group-hover/sidebar:opacity-100 group-hover/sidebar:translate-x-0 transition-all duration-[800ms] cubic-bezier(0.23, 1, 0.32, 1) delay-[100ms] group-hover/sidebar:delay-300">
+
         {/* Brand Logo - Top Absolute */}
         <div className="absolute top-0 left-0 w-full h-20 flex items-center justify-center">
-          <div className="w-10 h-10 rounded-xl bg-[#1428C9] flex items-center justify-center shadow-lg shadow-blue-900/20 active:scale-90 transition-transform cursor-pointer">
+          <div className="w-10 h-10 rounded-sm bg-[#1428C9] flex items-center justify-center active:scale-90 transition-transform cursor-pointer">
             <span className="text-white font-bold text-xl">O</span>
           </div>
         </div>
@@ -60,15 +60,14 @@ const Sidebar = () => {
                 <li key={idx} className="relative group">
                   <Link
                     to={item.href}
-                    className={`flex items-center justify-center w-full h-12 rounded-xl transition-all duration-300 ease-out active:scale-95 ${
-                      isActive 
-                        ? "bg-[#1428C9] text-white shadow-lg shadow-blue-900/20" 
-                        : "text-gray-400 hover:bg-gray-50 hover:text-[#111827]"
-                    }`}
+                    className={`flex items-center justify-center w-full h-12 rounded-sm transition-all duration-300 ease-out active:scale-95 ${isActive
+                      ? "bg-[#1428C9] text-white"
+                      : "text-gray-400 hover:bg-gray-50 hover:text-[#111827]"
+                      }`}
                   >
                     {item.icon}
                     {/* Tooltip on hover */}
-                    <span className="absolute left-16 px-3 py-2 rounded-xl whitespace-nowrap text-xs font-bold text-white bg-[#111827] opacity-0 translate-x-[-10px] group-hover:opacity-100 group-hover:translate-x-0 pointer-events-none transition-all duration-200 z-[100] shadow-2xl">
+                    <span className="absolute left-16 px-3 py-2 rounded-sm whitespace-nowrap text-xs font-bold text-white bg-[#111827] opacity-0 translate-x-[-10px] group-hover:opacity-100 group-hover:translate-x-0 pointer-events-none transition-all duration-200 z-[100]">
                       {item.name}
                       {/* Small Arrow */}
                       <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#111827] rotate-45" />
@@ -87,10 +86,10 @@ const Sidebar = () => {
               <li key={idx} className="relative group">
                 <Link
                   to={item.href}
-                  className="flex items-center justify-center w-full h-12 rounded-xl text-gray-400 hover:bg-gray-50 hover:text-[#111827] transition-all duration-300 ease-out active:scale-95"
+                  className="flex items-center justify-center w-full h-12 rounded-sm text-gray-400 hover:bg-gray-50 hover:text-[#111827] transition-all duration-300 ease-out active:scale-95"
                 >
                   {item.icon}
-                  <span className="absolute left-16 px-3 py-2 rounded-xl whitespace-nowrap text-xs font-bold text-white bg-[#111827] opacity-0 translate-x-[-10px] group-hover:opacity-100 group-hover:translate-x-0 pointer-events-none transition-all duration-200 z-[100] shadow-2xl">
+                  <span className="absolute left-16 px-3 py-2 rounded-sm whitespace-nowrap text-xs font-bold text-white bg-[#111827] opacity-0 translate-x-[-10px] group-hover:opacity-100 group-hover:translate-x-0 pointer-events-none transition-all duration-200 z-[100]">
                     {item.name}
                     <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#111827] rotate-45" />
                   </span>

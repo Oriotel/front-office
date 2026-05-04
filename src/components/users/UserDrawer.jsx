@@ -1,5 +1,5 @@
-import { X, Camera, Info, Plus } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { X, Camera, Info, Plus, Upload, Trash2 } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { cn } from '../../utils/cn';
 import Button from '../common/Button';
 import Input from '../common/Input';
@@ -18,7 +18,11 @@ const UserDrawer = ({ isOpen, onClose, onSubmit, initialData }) => {
     cin: '',
     adresse: '',
     dateNaissance: '',
+    photo: null,
   });
+
+  const [photoPreview, setPhotoPreview] = useState(null);
+  const fileInputRef = useRef(null);
 
   const [availableRoles, setAvailableRoles] = useState(DEFAULT_ROLES);
   const [isAddingRole, setIsAddingRole] = useState(false);
@@ -27,7 +31,19 @@ const UserDrawer = ({ isOpen, onClose, onSubmit, initialData }) => {
 
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
+      // Normalize null values from API to empty strings for controlled inputs
+      setFormData({
+        nom: initialData.nom ?? '',
+        prenom: initialData.prenom ?? '',
+        email: initialData.email ?? '',
+        telephone: initialData.telephone ?? '',
+        role: initialData.role ?? USER_ROLES.ASSISTANT,
+        cin: initialData.cin ?? '',
+        adresse: initialData.adresse ?? '',
+        dateNaissance: initialData.dateNaissance ?? '',
+        photo: null,
+      });
+      setPhotoPreview(initialData.photo ?? null);
       // If the user has a custom role not in the list, add it
       if (initialData.role && !availableRoles.includes(initialData.role)) {
         setAvailableRoles(prev => [...prev, initialData.role]);
@@ -42,13 +58,33 @@ const UserDrawer = ({ isOpen, onClose, onSubmit, initialData }) => {
         cin: '',
         adresse: '',
         dateNaissance: '',
+        photo: null,
       });
+      setPhotoPreview(null);
     }
   }, [initialData, isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData(prev => ({ ...prev, photo: file }));
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removePhoto = () => {
+    setFormData(prev => ({ ...prev, photo: null }));
+    setPhotoPreview(initialData?.photo || null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleRoleSelect = (role) => {
@@ -71,10 +107,46 @@ const UserDrawer = ({ isOpen, onClose, onSubmit, initialData }) => {
     setRoleDropdownOpen(false);
   };
 
-  const handleSubmit = (e) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
-    onClose();
+    try {
+      setIsSubmitting(true);
+      
+      // Use FormData to support file upload
+      const data = new FormData();
+      Object.keys(formData).forEach(key => {
+        if (formData[key] !== null && formData[key] !== undefined && formData[key] !== '') {
+          // Special handling for photo: only append if it's a File object
+          if (key === 'photo') {
+            if (formData[key] instanceof File || formData[key] instanceof Blob) {
+              data.append(key, formData[key]);
+            }
+          } else {
+            data.append(key, formData[key]);
+          }
+        }
+      });
+
+      // Always provide a password for new users
+      if (!initialData) {
+        data.append('password', 'password123');
+      }
+
+      await onSubmit(data);
+      onClose();
+    } catch (err) {
+      // Log full server validation errors for debugging
+      if (err.response?.data?.errors) {
+        console.error('[422 Validation Errors]', err.response.data.errors);
+        console.error('[422 Message]', err.response.data.message);
+      } else {
+        console.error('[Error]', err);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -91,7 +163,7 @@ const UserDrawer = ({ isOpen, onClose, onSubmit, initialData }) => {
       {/* Drawer */}
       <div
         className={cn(
-          "fixed top-0 right-0 h-full w-[500px] bg-white z-[70] shadow-2xl transition-transform duration-500 ease-in-out flex flex-col",
+          "fixed top-0 right-0 h-full w-[500px] bg-white z-[70] border-l border-gray-100 transition-transform duration-500 ease-in-out flex flex-col",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
@@ -104,12 +176,47 @@ const UserDrawer = ({ isOpen, onClose, onSubmit, initialData }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-8 pb-8 space-y-6 pt-4">
-          {/* Photo Upload Placeholder */}
+          
+          {/* Enhanced Photo Upload */}
           <div className="flex flex-col items-center gap-4 py-6">
-            <div className="w-24 h-24 border-2 border-dashed border-gray-200 rounded-2xl flex items-center justify-center text-gray-300">
-              <Camera size={32} />
+            <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+              {photoPreview ? (
+                <img 
+                  src={photoPreview} 
+                  alt="Preview" 
+                  className="w-28 h-28 rounded-sm object-cover border-4 border-white group-hover:brightness-90 transition-all"
+                />
+              ) : (
+                <div className="w-28 h-28 border-2 border-dashed border-slate-200 rounded-sm flex flex-col items-center justify-center text-slate-400 bg-slate-50 group-hover:bg-slate-100 transition-colors">
+                  <Camera size={32} strokeWidth={1.5} />
+                  <span className="text-[10px] font-bold mt-2 uppercase tracking-widest">Choisir</span>
+                </div>
+              )}
+              
+              <div className="absolute -bottom-2 -right-2 flex gap-1">
+                <div className="w-8 h-8 rounded-sm bg-[#1428C9] text-white flex items-center justify-center hover:scale-110 transition-transform">
+                  <Upload size={14} />
+                </div>
+                {formData.photo && (
+                  <button 
+                    type="button" 
+                    onClick={(e) => { e.stopPropagation(); removePhoto(); }}
+                    className="w-8 h-8 rounded-sm bg-red-500 text-white flex items-center justify-center hover:scale-110 transition-transform"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                )}
+              </div>
             </div>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Photo de profil</p>
+            
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handlePhotoChange} 
+              className="hidden" 
+              accept="image/*"
+            />
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Photo de profil</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -142,41 +249,41 @@ const UserDrawer = ({ isOpen, onClose, onSubmit, initialData }) => {
             <button
               type="button"
               onClick={() => setIsAddingRole(true)}
-              className="text-[10px] font-bold text-[#1428C9] uppercase tracking-widest ml-1 hover:underline"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-sm bg-[#1428C9]/5 text-[#1428C9] text-[11px] font-bold uppercase tracking-wider hover:bg-[#1428C9]/10 transition-all active:scale-95 border border-[#1428C9]/10"
             >
-              + Créer un rôle personnalisé
+              <Plus size={14} />
+              Créer un rôle personnalisé
             </button>
           ) : (
-            <div className="bg-[#F0F3FF] p-4 rounded-2xl border-2 border-dashed border-[#1428C9]/20 animate-in slide-in-up duration-300">
+            <div className="bg-slate-50 p-4 rounded-sm border border-slate-200 animate-in slide-in-up duration-300">
               <div className="flex flex-col gap-3">
                 <label className="text-[10px] font-bold text-[#1428C9] uppercase tracking-widest">Nouveau rôle</label>
                 <div className="flex items-center gap-2">
-                  <input
+                  <Input
                     autoFocus
-                    type="text"
                     value={newRoleName}
                     onChange={e => setNewRoleName(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddNewRole(); } if (e.key === 'Escape') setIsAddingRole(false); }}
                     placeholder="ex: Manager Regional"
-                    className="flex-1 px-4 py-2.5 text-sm bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1428C9]/20"
+                    containerClassName="flex-1"
                   />
                   <Button variant="primary" size="sm" onClick={handleAddNewRole} className="h-10 px-6">Créer</Button>
-                  <button type="button" onClick={() => setIsAddingRole(false)} className="p-2 text-gray-400"><X size={20} /></button>
+                  <button type="button" onClick={() => setIsAddingRole(false)} className="p-2 text-slate-400"><X size={20} /></button>
                 </div>
               </div>
             </div>
           )}
 
-          <div className="p-4 bg-[#F0F3FF] rounded-xl border border-blue-100 flex gap-3">
-            <Info className="text-blue-600 shrink-0 mt-0.5" size={20} />
-            <p className="text-[11px] text-[#1428C9] leading-relaxed font-bold">
-              L'identifiant (format OR-YYYY-XXX) et le mot de passe provisoire seront générés automatiquement et envoyés par email.
+          <div className="p-4 bg-slate-50 rounded-sm border border-slate-200 flex gap-3">
+            <Info className="text-[#1428C9] shrink-0 mt-0.5" size={20} />
+            <p className="text-[11px] text-slate-600 leading-relaxed font-semibold">
+              L'identifiant (format USRXXX) et le mot de passe provisoire seront générés automatiquement.
             </p>
           </div>
 
           <div className="pt-4 flex items-center gap-4">
             <Button variant="outline" className="flex-1" onClick={onClose} type="button">Annuler</Button>
-            <Button variant="primary" className="flex-[2]" type="submit">
+            <Button variant="primary" className="flex-[2]" type="submit" loading={isSubmitting}>
               {initialData ? 'Mettre à jour' : 'Valider la création'}
             </Button>
           </div>

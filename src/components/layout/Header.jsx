@@ -56,24 +56,19 @@ const Header = () => {
               <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-[#1428C9] rounded-full border-2 border-white"></span>
             </Button>
 
-            <Button variant="ghost" size="sm" className="hidden sm:flex items-center gap-2 px-3 py-2 text-sm font-bold">
-              <Globe size={18} />
-              <span>FR</span>
-            </Button>
-
             {/* Profile Dropdown */}
             <div className="flex items-center pl-2 md:pl-4 border-l border-gray-100 ml-1 md:ml-0">
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger className="outline-none group">
-                  <div className="flex items-center gap-3 p-1 rounded-xl hover:bg-gray-50 transition-all cursor-pointer">
+                  <div className="flex items-center gap-3 p-1 rounded-sm hover:bg-gray-50 transition-all cursor-pointer">
                     <Avatar.Root className="flex-none">
                       <Avatar.Image
-                        className="w-9 h-9 md:w-10 md:h-10 rounded-xl object-cover ring-2 ring-transparent group-hover:ring-[#1428C9]/10 transition-all"
+                        className="w-9 h-9 md:w-10 md:h-10 rounded-sm object-cover ring-2 ring-transparent group-hover:ring-[#1428C9]/10 transition-all"
                         src="https://randomuser.me/api/portraits/women/79.jpg"
                         alt="vienna"
                       />
                       <Avatar.Fallback
-                        className="flex w-9 h-9 md:w-10 md:h-10 rounded-xl items-center justify-center text-white text-xs font-bold bg-gradient-to-tr from-[#1428C9] to-blue-400"
+                        className="flex w-9 h-9 md:w-10 md:h-10 rounded-sm items-center justify-center text-white text-xs font-bold bg-gradient-to-tr from-[#1428C9] to-blue-400"
                       >
                         AD
                       </Avatar.Fallback>
@@ -88,7 +83,7 @@ const Header = () => {
 
                 <DropdownMenu.Portal>
                   <DropdownMenu.Content 
-                    className="z-[100] w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-300 cubic-bezier(0.4, 0, 0.2, 1)"
+                    className="z-[100] w-64 bg-white rounded-sm border border-gray-100 p-2 animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-300 cubic-bezier(0.4, 0, 0.2, 1)"
                     sideOffset={12}
                     align="end"
                   >
@@ -98,13 +93,13 @@ const Header = () => {
                     </div>
                     <div className="p-1">
                       <DropdownMenu.Item className="outline-none">
-                        <Link to="/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-600 hover:bg-[#F0F3FF] hover:text-[#1428C9] transition-all duration-200">
+                        <Link to="/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-semibold text-gray-600 hover:bg-[#F0F3FF] hover:text-[#1428C9] transition-all duration-200">
                           <Users size={18} />
                           <span>Mon Profil</span>
                         </Link>
                       </DropdownMenu.Item>
                       <DropdownMenu.Item className="outline-none">
-                        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-red-600 hover:bg-red-50 transition-all duration-200">
+                        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-semibold text-red-600 hover:bg-red-50 transition-all duration-200">
                           <LogOut size={18} />
                           <span>Déconnexion</span>
                         </button>

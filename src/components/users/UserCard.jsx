@@ -6,11 +6,17 @@ import { ROLE_STYLES, STATUS_STYLES } from '../../constants/users';
 
 const UserCard = ({ user, onEdit, onView }) => {
   return (
-    <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
+    <div className="bg-white p-5 rounded-sm border border-gray-100 transition-all group relative overflow-hidden">
       {/* Top Section: Avatar & Basic Info */}
       <div className="flex items-start gap-4 mb-5">
         <div className="relative">
-          <img src={user.avatar} alt="" className="w-14 h-14 rounded-2xl border border-gray-100 shadow-sm object-cover" />
+          {user.photo ? (
+            <img src={user.photo} alt="" className="w-14 h-14 rounded-sm border border-gray-100 object-cover" />
+          ) : (
+            <div className="w-14 h-14 rounded-sm border border-gray-100 bg-slate-50 flex items-center justify-center text-sm font-bold text-slate-400 uppercase">
+              {user.prenom?.[0]}{user.nom?.[0]}
+            </div>
+          )}
           <div className={cn(
             "absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white",
             user.statut === 'Actif' ? "bg-green-500" : "bg-gray-300"
@@ -19,7 +25,7 @@ const UserCard = ({ user, onEdit, onView }) => {
         <div className="flex-1 min-w-0">
           <p className="text-base font-bold text-[#111827] truncate">{user.prenom} {user.nom}</p>
           <div className="flex items-center gap-1.5 mt-1">
-            <span className="text-xs font-bold text-[#1428C9] bg-[#F0F3FF] px-2 py-0.5 rounded-lg border border-[#1428C9]/5">
+            <span className="text-xs font-bold text-[#1428C9] bg-[#F0F3FF] px-2 py-0.5 rounded-sm border border-[#1428C9]/5">
               {user.identifiant}
             </span>
             <Badge className={cn("scale-90 origin-left", STATUS_STYLES[user.statut])}>
@@ -32,19 +38,19 @@ const UserCard = ({ user, onEdit, onView }) => {
       {/* Details Grid */}
       <div className="space-y-3 mb-6">
         <div className="flex items-center gap-3 text-gray-500">
-          <div className="w-8 h-8 rounded-lg bg-[#F9FAFB] flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-sm bg-[#F9FAFB] flex items-center justify-center shrink-0">
             <Mail size={14} />
           </div>
           <p className="text-xs font-medium truncate">{user.email}</p>
         </div>
         <div className="flex items-center gap-3 text-gray-500">
-          <div className="w-8 h-8 rounded-lg bg-[#F9FAFB] flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-sm bg-[#F9FAFB] flex items-center justify-center shrink-0">
             <Phone size={14} />
           </div>
           <p className="text-xs font-medium">{user.telephone}</p>
         </div>
         <div className="flex items-center gap-3 text-gray-500">
-          <div className="w-8 h-8 rounded-lg bg-[#F9FAFB] flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-sm bg-[#F9FAFB] flex items-center justify-center shrink-0">
             <Hash size={14} />
           </div>
           <div className="flex items-center gap-2">

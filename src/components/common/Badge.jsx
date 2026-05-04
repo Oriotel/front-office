@@ -12,7 +12,7 @@ const Badge = ({ children, variant = 'default', className }) => {
 
   return (
     <span className={cn(
-      'px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border',
+      'px-2.5 py-0.5 rounded-sm text-[10px] font-bold uppercase tracking-wider border',
       variants[variant] || variants.default,
       className
     )}>

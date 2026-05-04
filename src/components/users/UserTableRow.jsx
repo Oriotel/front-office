@@ -6,13 +6,19 @@ import { ROLE_STYLES, STATUS_STYLES } from '../../constants/users';
 
 const UserTableRow = ({ user, onEdit, onView }) => {
   return (
-    <tr className="hover:bg-[#F0F3FF]/50 hover:scale-[1.01] hover:shadow-xl hover:z-10 transition-all duration-300 ease-in-out group border-b border-gray-50 last:border-0 relative animate-in fade-in slide-in-up">
+    <tr className="hover:bg-[#F0F3FF]/50 hover:scale-[1.01] hover:z-10 transition-all duration-300 ease-in-out group border-b border-gray-50 last:border-0 relative animate-in fade-in slide-in-up">
       {/* 1. Photo */}
       <td className="px-6 py-4">
         <div className="relative w-10 h-10">
-          <img src={user.avatar} alt="" className="w-10 h-10 rounded-xl border border-gray-100 bg-white object-cover shadow-sm group-hover:shadow-md transition-all duration-300" />
+          {user.photo ? (
+            <img src={user.photo} alt="" className="w-10 h-10 rounded-sm border border-gray-100 bg-white object-cover transition-all duration-300" />
+          ) : (
+            <div className="w-10 h-10 rounded-sm border border-gray-100 bg-slate-50 flex items-center justify-center text-[11px] font-bold text-slate-400 uppercase transition-all duration-300 group-hover:bg-slate-100">
+              {user.prenom?.[0]}{user.nom?.[0]}
+            </div>
+          )}
           <div className={cn(
-            "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm",
+            "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white",
             user.statut === 'Actif' ? "bg-green-500" : "bg-gray-300"
           )} />
         </div>
@@ -25,7 +31,7 @@ const UserTableRow = ({ user, onEdit, onView }) => {
 
       {/* 3. Identifiant */}
       <td className="px-6 py-4">
-        <span className="text-[10px] font-bold text-[#1428C9] bg-[#F0F3FF] px-2.5 py-1 rounded-lg border border-[#1428C9]/10 whitespace-nowrap shadow-sm group-hover:shadow-blue-900/10 transition-all duration-300">
+        <span className="text-[10px] font-bold text-[#1428C9] bg-[#F0F3FF] px-2.5 py-1 rounded-sm border border-[#1428C9]/10 whitespace-nowrap transition-all duration-300">
           {user.identifiant}
         </span>
       </td>
@@ -49,7 +55,7 @@ const UserTableRow = ({ user, onEdit, onView }) => {
 
       {/* 7. Rôle */}
       <td className="px-6 py-4">
-        <Badge className={cn("whitespace-nowrap shadow-sm group-hover:shadow-md transition-all duration-300", ROLE_STYLES[user.role])}>{user.role}</Badge>
+        <Badge className={cn("whitespace-nowrap transition-all duration-300", ROLE_STYLES[user.role])}>{user.role}</Badge>
       </td>
 
       {/* 8. Date Naiss. */}
@@ -64,7 +70,7 @@ const UserTableRow = ({ user, onEdit, onView }) => {
 
       {/* 10. Statut */}
       <td className="px-6 py-4">
-        <Badge className={cn("whitespace-nowrap shadow-sm group-hover:shadow-md transition-all duration-300", STATUS_STYLES[user.statut])}>{user.statut}</Badge>
+        <Badge className={cn("whitespace-nowrap transition-all duration-300", STATUS_STYLES[user.statut])}>{user.statut}</Badge>
       </td>
 
       {/* 11. Actions */}

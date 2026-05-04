@@ -34,16 +34,22 @@ const UserDetailsModal = ({ isOpen, onClose, user }) => {
         onClick={onClose}
       />
 
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] bg-white z-[90] rounded-2xl shadow-2xl transition-all duration-300 animate-in zoom-in-95 flex flex-col max-h-[90vh]">
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] bg-white z-[90] rounded-sm transition-all duration-300 animate-in zoom-in-95 flex flex-col max-h-[90vh]">
         {/* Header with Avatar */}
-        <div className="p-8 border-b border-gray-50 bg-[#F9FAFB] rounded-t-2xl relative">
+        <div className="p-8 border-b border-gray-50 bg-[#F9FAFB] rounded-t-sm relative">
           <Button variant="ghost" size="sm" onClick={onClose} icon={X} className="absolute right-6 top-6" />
           
           <div className="flex items-center gap-6">
             <div className="relative">
-              <img src={user.avatar} alt="" className="w-20 h-20 rounded-2xl border-4 border-white shadow-sm object-cover" />
+              {user.photo ? (
+                <img src={user.photo} alt="" className="w-20 h-20 rounded-sm border-4 border-white object-cover" />
+              ) : (
+                <div className="w-20 h-20 rounded-sm border-4 border-white bg-slate-50 flex items-center justify-center text-xl font-bold text-slate-400 uppercase">
+                  {user.prenom?.[0]}{user.nom?.[0]}
+                </div>
+              )}
               <div className={cn(
-                "absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white shadow-sm",
+                "absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white",
                 user.statut === 'Actif' ? "bg-green-500" : "bg-gray-300"
               )} />
             </div>
@@ -68,7 +74,7 @@ const UserDetailsModal = ({ isOpen, onClose, user }) => {
                 <div className="space-y-4">
                   {group.items.map((item) => (
                     <div key={item.label} className="flex gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-[#F0F3FF] flex items-center justify-center text-[#1428C9] shrink-0">
+                      <div className="w-8 h-8 rounded-sm bg-[#F0F3FF] flex items-center justify-center text-[#1428C9] shrink-0">
                         <item.icon size={16} />
                       </div>
                       <div className="min-w-0">

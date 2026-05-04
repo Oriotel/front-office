@@ -15,17 +15,13 @@ const UsersPage = () => {
     setFilters,
     addUser,
     updateUser,
+    loading: isLoading,
+    error,
   } = useUsers();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1200);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleNewUser = () => {
     setSelectedUser(null);
@@ -51,16 +47,25 @@ const UsersPage = () => {
     setFilters({ role: '', statut: '', dateCreation: '' });
   };
 
-  const handleDrawerSubmit = (data) => {
+  const handleDrawerSubmit = async (data) => {
     if (selectedUser) {
-      updateUser(selectedUser.id, data);
+      // Debug: log what we're sending
+      if (data instanceof FormData) {
+        console.log('[Update] User ID:', selectedUser.id, 'Email being sent:', data.get('email'));
+      }
+      await updateUser(selectedUser.id, data);
     } else {
-      addUser(data);
+      await addUser(data);
     }
   };
 
   return (
     <div className="w-full mx-auto pb-12 space-y-8">
+      {error && (
+        <div className="p-4 bg-red-50 text-red-600 rounded-lg border border-red-200 animate-in fade-in zoom-in duration-300">
+          {error}
+        </div>
+      )}
       {/* Filters section with staggered entry */}
       <div className="animate-in fade-in slide-in-up duration-500">
         <UserFilters 

@@ -7,7 +7,7 @@ import Button from '../common/Button';
 const UserTable = ({ users, onEdit, onView }) => {
   if (users.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 mt-8 text-center">
+      <div className="bg-white rounded-sm border border-gray-100 p-12 mt-8 text-center">
         <p className="text-gray-400 font-medium">Aucun utilisateur trouvé</p>
       </div>
     );
@@ -28,7 +28,7 @@ const UserTable = ({ users, onEdit, onView }) => {
       </div>
 
       {/* Desktop View (Table) */}
-      <div className="hidden lg:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden transition-all hover:shadow-md">
+      <div className="hidden lg:block bg-white rounded-sm border border-gray-100 overflow-hidden transition-all">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <UserTableHeader />
@@ -56,7 +56,7 @@ const UserTable = ({ users, onEdit, onView }) => {
             <ChevronLeft size={20} />
           </button>
           <div className="flex items-center gap-4">
-            <button className="w-9 h-9 bg-[#1428C9] text-white rounded-lg text-sm font-bold shadow-lg shadow-blue-900/20 flex items-center justify-center">1</button>
+            <button className="w-9 h-9 bg-[#1428C9] text-white rounded-sm text-sm font-bold flex items-center justify-center">1</button>
             <button className="text-sm font-bold text-gray-400 hover:text-[#111827] transition-colors px-2">2</button>
             <button className="text-sm font-bold text-gray-400 hover:text-[#111827] transition-colors px-2">3</button>
             <span className="text-sm font-bold text-gray-300 px-1">...</span>

@@ -50,7 +50,7 @@ const DetailModal = ({ entry, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 backdrop-blur-sm" style={{ background:'rgba(17,24,39,0.6)' }} />
-      <div className="relative w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden border border-blue-100" style={{ background: B.white }} onClick={e => e.stopPropagation()}>
+      <div className="relative w-full max-w-xl rounded-md overflow-hidden border border-gray-200" style={{ background: B.white }} onClick={e => e.stopPropagation()}>
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200" style={{ background: B.slate }}>
           <div className="flex items-center gap-3">
@@ -68,15 +68,15 @@ const DetailModal = ({ entry, onClose }) => {
         {/* Modal Body */}
         <div className="p-6 space-y-4">
           {/* User Row */}
-          <div className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 bg-white">
-            <div className="w-11 h-11 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow" style={{ background: B.blue }}>
+          <div className="flex items-center gap-4 p-4 rounded-md border border-gray-200 bg-white">
+            <div className="w-11 h-11 rounded-md flex items-center justify-center text-white font-bold text-lg" style={{ background: B.blue }}>
               {entry.user.charAt(0)}
             </div>
             <div className="flex-1">
               <div className="font-semibold text-sm" style={{ color: B.slate }}>{entry.user}</div>
               <span className="text-xs px-2 py-0.5 rounded-md font-medium mt-1 inline-block" style={{ background:`${B.blue}15`, color: B.blue, border:`1px solid ${B.blue}30` }}>{entry.role}</span>
             </div>
-            <span className={`text-xs font-semibold px-3 py-1.5 rounded-lg border ${ti.color}`}>{ti.label}</span>
+            <span className={`text-xs font-semibold px-3 py-1.5 rounded-md border ${ti.color}`}>{ti.label}</span>
           </div>
 
           {/* Action */}
@@ -107,7 +107,7 @@ const DetailModal = ({ entry, onClose }) => {
 
         {/* Modal Footer */}
         <div className="px-6 pb-6">
-          <button onClick={exportFiche} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-semibold shadow-lg transition-all hover:opacity-90" style={{ background: B.blue }}>
+          <button onClick={exportFiche} className="w-full flex items-center justify-center gap-2 py-3 rounded-md text-white text-sm font-semibold transition-all hover:opacity-90 shadow-none border border-gray-200" style={{ background: B.blue }}>
             <Download className="w-4 h-4" /> Exporter cette fiche en PDF
           </button>
         </div>
@@ -171,16 +171,11 @@ const UserHistoryPage = () => {
     doc.save(`oriotel_historique_${new Date().toISOString().slice(0,10)}.pdf`);
   };
 
-  const inputCls = 'w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:border-blue-500 cursor-pointer transition-colors';
+  const inputCls = 'w-full px-3 py-2.5 bg-white border border-gray-200 rounded-md text-sm outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer transition-colors shadow-none';
 
   return (
-    <div className="flex min-h-screen" style={{ background: B.white }}>
+    <div className="min-h-screen" style={{ background: B.white }}>
       {selectedEntry && <DetailModal entry={selectedEntry} onClose={() => setSelectedEntry(null)} />}
-
-      <OriotelSidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(v => !v)} />
-
-      <div className="flex flex-col flex-1 min-w-0">
-      <OriotelNavbar breadcrumbs={['ERP', 'Audit', 'Historique des Actions']} />
 
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
 
@@ -192,14 +187,14 @@ const UserHistoryPage = () => {
           </div>
           <div className="flex items-center gap-3">
             <button onClick={() => setShowFilters(v => !v)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border transition-all"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium border border-gray-200 transition-all shadow-none"
               style={{ background: showFilters || activeCount > 0 ? `${B.blue}10` : '#fff', borderColor: showFilters || activeCount > 0 ? B.blue : '#e5e7eb', color: showFilters || activeCount > 0 ? B.blue : B.slate }}>
               <Filter className="w-4 h-4" />
               Filtres
-              {activeCount > 0 && <span className="w-5 h-5 rounded-full text-white text-xs flex items-center justify-center font-bold" style={{ background: B.blue }}>{activeCount}</span>}
+              {activeCount > 0 && <span className="w-5 h-5 rounded-full text-white text-xs flex items-center justify-center font-bold shadow-none border-none" style={{ background: B.blue }}>{activeCount}</span>}
             </button>
             <button onClick={exportTablePDF}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold shadow-lg transition-all hover:opacity-90"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-md text-white text-sm font-semibold transition-all hover:opacity-90 shadow-none border border-gray-200"
               style={{ background: B.blue }}>
               <Download className="w-4 h-4" /> Exporter PDF
             </button>
@@ -214,11 +209,11 @@ const UserHistoryPage = () => {
             { label:'Souscriptions',   value: mockHistory.filter(i=>i.type==='souscription'||i.type==='validation').length },
             { label:'Anomalies/Refus', value: mockHistory.filter(i=>i.type==='anomalie'||i.type==='refus').length },
           ].map((s,i) => (
-            <div key={s.label} className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-              <div className="text-3xl font-bold" style={{ color: i===0 ? B.blue : i===1 ? '#059669' : i===2 ? '#7c3aed' : '#dc2626' }}>{s.value}</div>
-              <div className="text-sm text-gray-500 mt-1">{s.label}</div>
-              <div className="mt-3 h-1 rounded-full" style={{ background: `${B.blue}15` }}>
-                <div className="h-1 rounded-full transition-all" style={{ width:`${(s.value/mockHistory.length)*100}%`, background: B.blue }} />
+            <div key={s.label} className="bg-white rounded-md p-5 border border-gray-200 shadow-none transition-all">
+              <div className="text-3xl font-bold shadow-none border-none" style={{ color: i===0 ? B.blue : i===1 ? '#059669' : i===2 ? '#7c3aed' : '#dc2626' }}>{s.value}</div>
+              <div className="text-sm text-gray-500 mt-1 shadow-none border-none">{s.label}</div>
+              <div className="mt-3 h-1 rounded-full shadow-none border-none" style={{ background: `${B.blue}15` }}>
+                <div className="h-1 rounded-full transition-all shadow-none border-none" style={{ width:`${(s.value/mockHistory.length)*100}%`, background: B.blue }} />
               </div>
             </div>
           ))}
@@ -228,17 +223,15 @@ const UserHistoryPage = () => {
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input id="history-search" type="text" placeholder="Rechercher une action, un utilisateur…"
-            className="w-full pl-12 pr-10 py-3.5 bg-white border border-gray-200 rounded-xl text-sm outline-none shadow-sm transition-all"
+            className="w-full pl-12 pr-10 py-3.5 bg-white border border-gray-200 rounded-md text-sm outline-none shadow-none transition-all"
             style={{ color: B.slate }}
-            onFocus={e => e.target.style.borderColor=B.blue}
-            onBlur={e => e.target.style.borderColor='#e5e7eb'}
             value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
           {searchTerm && <button onClick={()=>setSearchTerm('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">✕</button>}
         </div>
 
         {/* Filters */}
         {showFilters && (
-          <div className="bg-white border border-gray-200 p-5 rounded-2xl shadow-sm grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-white border border-gray-200 p-5 rounded-md shadow-none grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5" style={{ color: B.blue }}><User className="w-3.5 h-3.5" /> Utilisateur</label>
               <select id="filter-user" className={inputCls} style={{ color: B.slate }} value={selectedUser} onChange={e=>setSelectedUser(e.target.value)}>
@@ -283,7 +276,7 @@ const UserHistoryPage = () => {
         )}
 
         {/* Table */}
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-md shadow-none overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left min-w-[900px]">
               <thead>
@@ -299,17 +292,17 @@ const UserHistoryPage = () => {
                   return (
                     <tr key={item.id} onClick={() => setSelectedEntry(item)}
                       className="cursor-pointer group transition-all"
-                      style={{ borderBottom:'1px solid #f3f4f6', background: idx%2===0?'#fff':'#fafafa' }}
+                      style={{ borderBottom:'1px solid #f3f4f6', background: idx%2===0?'#fff':'#f9fafb' }}
                       onMouseEnter={e => e.currentTarget.style.background=`${B.blue}08`}
                       onMouseLeave={e => e.currentTarget.style.background=idx%2===0?'#fff':'#fafafa'}>
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm text-white shadow flex-shrink-0 transition-transform group-hover:scale-105" style={{ background: B.blue }}>
+                          <div className="w-9 h-9 rounded-md flex items-center justify-center font-bold text-sm text-white flex-shrink-0 transition-transform group-hover:scale-105 shadow-none" style={{ background: B.blue }}>
                             {item.user.charAt(0)}
                           </div>
-                          <div>
-                            <div className="font-semibold text-sm" style={{ color: B.slate }}>{item.user}</div>
-                            <span className="text-xs px-2 py-0.5 rounded-md font-medium mt-0.5 inline-block" style={{ background:`${B.blue}12`, color: B.blue, border:`1px solid ${B.blue}25` }}>{item.role}</span>
+                          <div className="shadow-none">
+                            <div className="font-semibold text-sm shadow-none" style={{ color: B.slate }}>{item.user}</div>
+                            <span className="text-xs px-2 py-0.5 rounded-md font-medium mt-0.5 inline-block shadow-none" style={{ background:`${B.blue}12`, color: B.blue, border:`1px solid ${B.blue}25` }}>{item.role}</span>
                           </div>
                         </div>
                       </td>
@@ -318,7 +311,7 @@ const UserHistoryPage = () => {
                         <p className="text-gray-500 text-xs mt-1.5 line-clamp-2">{item.action}</p>
                       </td>
                       <td className="px-5 py-4">
-                        <span className="text-xs text-gray-500 bg-gray-100 px-2.5 py-1 rounded-lg border border-gray-200 whitespace-nowrap">{item.module}</span>
+                        <span className="text-xs text-gray-500 bg-gray-100 px-2.5 py-1 rounded-md border border-gray-200 shadow-none whitespace-nowrap">{item.module}</span>
                       </td>
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-1.5 text-gray-500 text-xs whitespace-nowrap">
@@ -356,28 +349,27 @@ const UserHistoryPage = () => {
             {totalPages > 1 && (
               <div className="flex items-center gap-1.5">
                 <button onClick={() => setCurrentPage(p=>Math.max(1,p-1))} disabled={currentPage===1}
-                  className="p-2 rounded-lg border border-gray-200 text-gray-400 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="p-2 rounded-md border border-gray-200 text-gray-400 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-none"
                   style={{ background: 'white' }} onMouseEnter={e=>e.currentTarget.style.background=B.blue} onMouseLeave={e=>e.currentTarget.style.background='white'}>
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 {Array.from({length:totalPages}).map((_,i) => (
                   <button key={i} onClick={() => setCurrentPage(i+1)}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-semibold border transition-all"
+                    className="w-8 h-8 rounded-md flex items-center justify-center text-xs font-semibold border border-gray-200 transition-all shadow-none"
                     style={{ background: currentPage===i+1 ? B.blue : 'white', color: currentPage===i+1 ? 'white' : B.slate, borderColor: currentPage===i+1 ? B.blue : '#e5e7eb' }}>
                     {i+1}
                   </button>
                 ))}
                 <button onClick={() => setCurrentPage(p=>Math.min(totalPages,p+1))} disabled={currentPage===totalPages}
-                  className="p-2 rounded-lg border border-gray-200 text-gray-400 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="p-2 rounded-md border border-gray-200 text-gray-400 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-none"
                   style={{ background: 'white' }} onMouseEnter={e=>e.currentTarget.style.background=B.blue} onMouseLeave={e=>e.currentTarget.style.background='white'}>
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
             )}
-          </div>
         </div>
       </div>
-      </div>
+    </div>
     </div>
   );
 };

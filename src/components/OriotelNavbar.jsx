@@ -2,8 +2,8 @@ import React from 'react';
 import { LayoutGrid, Search, Bell, ChevronRight } from 'lucide-react';
 
 const OriotelNavbar = ({ breadcrumbs = [] }) => (
-  <nav style={{ background: '#111827', borderBottom: '3px solid #1428C9' }}
-    className="sticky top-0 z-20 flex items-center justify-between px-6 py-3 shadow-lg">
+  <nav style={{ background: '#111827' }}
+    className="sticky top-0 z-20 flex items-center justify-between px-6 py-3 shadow-none border-none">
     {/* Left: Logo + Breadcrumb */}
     <div className="flex items-center gap-6">
       <div className="flex items-center gap-2">
@@ -36,8 +36,8 @@ const OriotelNavbar = ({ breadcrumbs = [] }) => (
         <Bell className="w-4 h-4 text-gray-300" />
         <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-white text-xs flex items-center justify-center font-bold" style={{ background: '#1428C9' }}>3</span>
       </button>
-      <button className="px-3 py-1.5 rounded-lg bg-gray-800 text-xs font-semibold text-gray-300 border border-gray-700 hover:bg-gray-700 transition-colors">FR</button>
-      <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold shadow" style={{ background: '#1428C9' }}>A</div>
+      <button className="px-3 py-1.5 rounded-lg bg-gray-800 text-xs font-semibold text-gray-300 border-none hover:bg-gray-700 transition-colors shadow-none">FR</button>
+      <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold" style={{ background: '#1428C9' }}>A</div>
     </div>
   </nav>
 );

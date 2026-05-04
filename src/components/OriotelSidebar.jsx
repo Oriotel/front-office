@@ -41,13 +41,12 @@ const OriotelSidebar = ({ collapsed, onToggle }) => {
       style={{
         width: collapsed ? 64 : 230,
         background: '#fff',
-        borderRight: '1px solid #e5e7eb',
-        boxShadow: '2px 0 12px rgba(0,0,0,0.04)',
+        borderRight: 'none',
       }}
     >
       {/* Logo */}
       <div className="flex items-center justify-between px-4 py-4"
-        style={{ borderBottom: `3px solid ${B.blue}` }}>
+        style={{ borderBottom: 'none' }}>
         {!collapsed && (
           <div className="flex items-center gap-2">
             <LayoutGrid className="w-5 h-5" style={{ color: B.blue }} />
@@ -118,7 +117,7 @@ const OriotelSidebar = ({ collapsed, onToggle }) => {
       </nav>
 
       {/* Bottom Items */}
-      <div className="py-3 space-y-1" style={{ borderTop: '1px solid #f3f4f6' }}>
+      <div className="py-3 space-y-1" style={{ borderTop: 'none' }}>
         {BOTTOM_ITEMS.map(item => {
           const Icon = item.icon;
           return (

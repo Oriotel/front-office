@@ -1,7 +1,4 @@
-/* ========== Base ========== */
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap");
-@import "@/styles/typography.css";
-@import "@/styles/auth.css";
 @import "tailwindcss";
 
 /* ========== Custom Fonts ========== */
@@ -17,6 +14,11 @@
 @theme inline {
   --font-carmine: "Carmine", ui-sans-serif, system-ui;
   --font-sans: "Montserrat", ui-sans-serif, system-ui;
+  
+  /* SaaS Dashboard Colors */
+  --color-primary: #1428C9;
+  --color-bg-light: #F9FAFB;
+  --color-text-dark: #111827;
 }
 
 /* ========== Utilities ========== */
@@ -26,4 +28,15 @@
 
 @utility font-montserrat {
   font-family: var(--font-sans);
+}
+
+/* Hide scrollbar for cleaner UI */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #e5e7eb;
 }

@@ -1,7 +1,11 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Suspense, lazy } from 'react'
+
 import GuestGuard from '@/guards/GuestGuard'
 import AuthGuard from '@/guards/AuthGuard'
+
+import DashboardLayout from './components/layout/DashboardLayout'
+import UsersPage from './pages/UsersPage'
 
 // Lazy-loaded auth pages
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
@@ -15,24 +19,6 @@ const LoadingSpinner = () => (
       <div className="auth-loading-dot"></div>
       <div className="auth-loading-dot"></div>
       <div className="auth-loading-dot"></div>
-    </div>
-  </div>
-)
-
-// Placeholder dashboard for post-login redirect
-const DashboardPlaceholder = () => (
-  <div style={{
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '100vh',
-    background: '#0a0e1a',
-    color: '#fff',
-    fontFamily: 'Montserrat, sans-serif',
-  }}>
-    <div style={{ textAlign: 'center' }}>
-      <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>🎉 Bienvenue sur le Dashboard</h1>
-      <p style={{ opacity: 0.7 }}>Authentification réussie. Le module Dashboard sera développé prochainement.</p>
     </div>
   </div>
 )
@@ -58,14 +44,19 @@ function App() {
         <Route path="/auth/change-password" element={<ForcePasswordChangePage />} />
 
         {/* Protected routes */}
-        <Route path="/dashboard" element={
+        <Route path="/" element={
           <AuthGuard>
-            <DashboardPlaceholder />
+            <DashboardLayout />
           </AuthGuard>
-        } />
+        }>
+          <Route index element={<Navigate to="/users" replace />} />
+          <Route path="users" element={<UsersPage />} />
+          <Route path="settings" element={<div className="p-8"><h1 className="text-2xl font-bold">Paramètres</h1></div>} />
+        </Route>
+
+        <Route path="/dashboard" element={<Navigate to="/users" replace />} />
 
         {/* Default redirect */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Suspense>

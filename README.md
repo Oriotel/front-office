@@ -1,16 +1,73 @@
-# React + Vite
+# Front-Office (Frontend Architecture)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 📌 Project Overview
+This project is the frontend for the **Front-Office** application, built using a modern React stack. It provides a fast, scalable, and maintainable architecture tailored for a seamless user experience.
 
-Currently, two official plugins are available:
+## 🛠️ Tech Stack
+- **Framework**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
+- **State Management**: [Redux Toolkit](https://redux-toolkit.js.org/) + React-Redux
+- **Routing**: [React Router DOM](https://reactrouter.com/)
+- **Internationalization (i18n)**: [i18next](https://www.i18next.com/) & React-i18next
+- **Utility Libraries**: `clsx`, `tailwind-merge` (for dynamic class merging)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Linting**: ESLint
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📂 Folder Structure
+The source code is organized inside the `src/` directory following a modular and feature-based approach:
 
-## React Compiler
+```text
+src/
+├── components/       # Reusable UI components
+│   ├── common/       # Generic components (e.g., Buttons, Skeletons)
+│   └── layout/       # Layout components (e.g., Header, Footer, Wrappers)
+├── constants/        # Application-wide static data and configurations
+├── hooks/            # Custom React hooks (e.g., useInView)
+├── pages/            # Page-level components corresponding to routes
+├── store/            # Redux store configuration and slices
+├── styles/           # Global stylesheets and CSS variables
+├── utils/            # Helper functions and API clients (e.g., api.js)
+├── App.jsx           # Root component (Routing and global providers)
+├── i18n.js           # Internationalization configuration
+├── index.css         # Main Tailwind CSS entry point
+└── main.jsx          # React application entry point
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🚀 Getting Started
 
-## Expanding the ESLint configuration
+### Prerequisites
+Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd front-office
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+### Running the Development Server
+```bash
+npm run dev
+```
+The app will be available at `http://localhost:5173/` by default.
+
+### Build for Production
+To generate a production-ready build:
+```bash
+npm run build
+```
+The optimized files will be output to the `dist/` directory. You can preview the production build using:
+```bash
+npm run preview
+```
+
+## 🌍 Internationalization (i18n)
+The project is configured with `i18next` for multiple language support. Translations are managed via the `i18n.js` setup. It uses browser language detection and HTTP backend for loading translation files.
+
+## 🎨 Styling Convention
+- The project leverages **Tailwind CSS** for rapid and consistent styling.
+- Utility classes are dynamically merged using `clsx` and `tailwind-merge` to resolve conflicts when extending component styles.

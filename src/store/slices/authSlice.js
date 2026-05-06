@@ -128,9 +128,12 @@ const authSlice = createSlice({
           state.passwordChangeRequired = true;
           state.authStep = AUTH_STEPS.FORCE_PASSWORD_CHANGE;
           state.isAuthenticated = false;
+          // Save token for subsequent API calls during password change flow
+          if (action.payload.token) localStorage.setItem('auth_token', action.payload.token);
         } else {
           state.isAuthenticated = true;
           state.authStep = AUTH_STEPS.AUTHENTICATED;
+          if (action.payload.token) localStorage.setItem('auth_token', action.payload.token);
         }
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -166,6 +169,8 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.twoFactorPending = false;
         state.token = action.payload.token;
+        // Persist final token after 2FA
+        if (action.payload.token) localStorage.setItem('auth_token', action.payload.token);
 
         if (state.user?.mustChangePassword) {
           state.passwordChangeRequired = true;
@@ -203,6 +208,7 @@ const authSlice = createSlice({
     // ── Logout ──
     builder
       .addCase(logoutUser.fulfilled, () => {
+        localStorage.removeItem('auth_token');
         return initialState;
       });
   },

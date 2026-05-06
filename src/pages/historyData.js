@@ -13,14 +13,16 @@ export const ACTION_TYPES = {
   communication: { label: 'Communication',   color: 'bg-sky-500/15     text-sky-400     border-sky-500/30'    },
   comptabilite:  { label: 'Comptabilité',    color: 'bg-yellow-500/15  text-yellow-400  border-yellow-500/30' },
   export:        { label: 'Export',          color: 'bg-pink-500/15    text-pink-400    border-pink-500/30'   },
+  modification:  { label: 'Modification',    color: 'bg-indigo-500/15  text-indigo-400  border-indigo-500/30' },
 };
 
 export const ROLES_COLORS = {
-  'Administrateur':      'bg-violet-500/20 text-violet-300 border-violet-500/30',
-  'Assistant':           'bg-blue-500/20   text-blue-300   border-blue-500/30',
-  'Animateur':           'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
-  'Comptable':           'bg-amber-500/20  text-amber-300  border-amber-500/30',
-  'Utilisateur Interne': 'bg-slate-500/20  text-slate-300  border-slate-500/30',
+  administrateur: 'bg-violet-500/20 text-violet-600 border-violet-500/30',
+  assistant:      'bg-blue-500/20   text-blue-600   border-blue-500/30',
+  animateur:      'bg-emerald-500/20 text-emerald-600 border-emerald-500/30',
+  agence:         'bg-amber-500/20  text-amber-600  border-amber-500/30',
+  operateur:      'bg-slate-500/20  text-slate-600  border-slate-500/30',
+  system:         'bg-gray-500/20   text-gray-600   border-gray-500/30',
 };
 
 export const mockHistory = [

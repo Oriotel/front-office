@@ -10,6 +10,7 @@ import {
   Clock,
   Settings,
   HelpCircle,
+  Activity,
 } from "lucide-react";
 
 import { ChevronRight } from "lucide-react";
@@ -19,6 +20,7 @@ const Sidebar = () => {
   const navigation = [
     { name: "Tableau de bord", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
     { name: "Utilisateurs", href: "/users", icon: <Users className="w-5 h-5" /> },
+    { name: "Historique", href: "/historique", icon: <Activity className="w-5 h-5" /> },
     { name: "Souscriptions", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> },
     { name: "Dossiers", href: "/dossiers", icon: <Folder className="w-5 h-5" /> },
     { name: "Stock", href: "/stock", icon: <Box className="w-5 h-5" /> },

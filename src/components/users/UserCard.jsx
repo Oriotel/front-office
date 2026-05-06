@@ -1,13 +1,13 @@
-import { Eye, Pencil, Phone, Mail, Hash } from 'lucide-react';
+import { Eye, Pencil, Phone, Mail, Hash, MapPin, Trash2 } from 'lucide-react';
 import Badge from '../common/Badge';
 import Button from '../common/Button';
 import { cn } from '../../utils/cn';
 import { ROLE_STYLES, STATUS_STYLES } from '../../constants/users';
 
-const UserCard = ({ user, onEdit, onView }) => {
+const UserCard = ({ user, onEdit, onView, onDelete }) => {
   return (
     <div className="bg-white p-5 rounded-sm border border-gray-100 transition-all group relative overflow-hidden">
-      {/* Top Section: Avatar & Basic Info */}
+      {/* ... top section ... */}
       <div className="flex items-start gap-4 mb-5">
         <div className="relative">
           {user.photo ? (
@@ -51,6 +51,12 @@ const UserCard = ({ user, onEdit, onView }) => {
         </div>
         <div className="flex items-center gap-3 text-gray-500">
           <div className="w-8 h-8 rounded-sm bg-[#F9FAFB] flex items-center justify-center shrink-0">
+            <MapPin size={14} />
+          </div>
+          <p className="text-xs font-medium truncate">{user.adresse || '-'}</p>
+        </div>
+        <div className="flex items-center gap-3 text-gray-500">
+          <div className="w-8 h-8 rounded-sm bg-[#F9FAFB] flex items-center justify-center shrink-0">
             <Hash size={14} />
           </div>
           <div className="flex items-center gap-2">
@@ -59,7 +65,7 @@ const UserCard = ({ user, onEdit, onView }) => {
         </div>
       </div>
 
-      {/* Actions — status is read-only, no toggle */}
+      {/* Actions */}
       <div className="flex items-center gap-2 pt-4 border-t border-gray-50">
         <Button
           variant="secondary"
@@ -79,6 +85,14 @@ const UserCard = ({ user, onEdit, onView }) => {
         >
           Éditer
         </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onDelete(user)}
+          className="w-10 h-10 p-0 text-red-500 hover:text-red-600 hover:bg-red-50 shrink-0"
+          icon={Trash2}
+          title="Supprimer"
+        />
       </div>
     </div>
   );

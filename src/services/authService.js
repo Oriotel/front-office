@@ -1,146 +1,120 @@
 import { AUTH_ENDPOINTS } from '../constants/authConstants';
+import api from '../utils/api';
 
 /**
  * Authentication Service Layer
  * 
  * This service provides a clean interface for auth API calls.
- * Currently uses mock data — swap with real API calls when backend is ready.
- * 
- * All methods return Promises to match real API behavior.
  */
-
-// Simulated network delay
-const simulateDelay = (ms = 1200) => new Promise((resolve) => setTimeout(resolve, ms));
-
-// Mock user database for development
-const MOCK_USERS = {
-  'admin@oriotel.com': {
-    id: '1',
-    email: 'admin@oriotel.com',
-    firstName: 'Admin',
-    lastName: 'Oriotel',
-    role: 'admin',
-    userType: null,
-    mustChangePassword: false,
-    twoFactorEnabled: true,
-    permissions: ['*'],
-    avatar: null,
-  },
-  'animateur@oriotel.com': {
-    id: '2',
-    email: 'animateur@oriotel.com',
-    firstName: 'Mohammed',
-    lastName: 'Alami',
-    role: 'interne',
-    userType: 'animateur',
-    mustChangePassword: true,
-    twoFactorEnabled: false,
-    permissions: ['view_dashboard', 'manage_events'],
-    avatar: null,
-  },
-  'agence@oriotel.com': {
-    id: '3',
-    email: 'agence@oriotel.com',
-    firstName: 'Sara',
-    lastName: 'Benali',
-    role: 'externe',
-    userType: 'agence',
-    mustChangePassword: false,
-    twoFactorEnabled: false,
-    permissions: ['view_dashboard', 'submit_requests'],
-    avatar: null,
-  },
-};
-
-const MOCK_PASSWORD = 'Oriotel@2026';
-const MOCK_2FA_CODE = '123456';
-const MOCK_TOKEN = 'mock-jwt-token-' + Date.now();
 
 class AuthService {
   /**
    * Login user with email and password
-   * @param {Object} credentials - { email, password, role, userType }
-   * @returns {Promise<Object>} - { user, token, refreshToken }
+   * @param {Object} credentials - { email, password }
+   * @returns {Promise<Object>}
    */
-  async login({ email, password, role, userType }) {
-    await simulateDelay();
+  async login({ email, password }) {
+    const response = await api.post(AUTH_ENDPOINTS.LOGIN, {
+      login: email,
+      password: password,
+    });
 
-    const user = MOCK_USERS[email.toLowerCase()];
-
-    if (!user || password !== MOCK_PASSWORD) {
-      throw new Error('Email ou mot de passe incorrect');
+    if (response.action === 'two_factor_required') {
+      return {
+        user: { id: response.user_id },
+        requiresTwoFactor: true,
+      };
     }
 
-    if (user.role !== role) {
-      throw new Error(`Ce compte n'est pas associé au rôle "${role}"`);
-    }
-
-    if (userType && user.userType !== userType) {
-      throw new Error(`Type de compte invalide pour cet utilisateur`);
+    if (response.action === 'force_password_change') {
+      return {
+        token: response.token,
+        requiresPasswordChange: true,
+      };
     }
 
     return {
-      user,
-      token: MOCK_TOKEN,
-      refreshToken: 'mock-refresh-token-' + Date.now(),
-      requiresTwoFactor: user.twoFactorEnabled,
-      requiresPasswordChange: user.mustChangePassword,
+      user: response.user,
+      token: response.token,
     };
   }
 
   /**
-   * Register a new user (submit access request to admin)
+   * Register a new user
    * @param {Object} data - Registration form data
-   * @returns {Promise<Object>} - { message, requestId }
+   * @returns {Promise<Object>}
    */
   async register(data) {
-    await simulateDelay(1500);
-
-    // Simulate email uniqueness check
-    if (MOCK_USERS[data.email.toLowerCase()]) {
-      throw new Error('Un compte avec cette adresse email existe déjà');
-    }
-
-    return {
-      message: 'Votre demande d\'accès a été soumise avec succès. Un administrateur examinera votre demande.',
-      requestId: 'REQ-' + Date.now(),
+    const payload = {
+      first_name: data.firstName,
+      last_name: data.lastName,
+      email: data.email,
+      cin: data.cin,
+      phone: data.phone,
+      access_reason: data.reason,
+      terms: data.acceptTerms,
+      password: data.password,
+      password_confirmation: data.passwordConfirmation,
+      role: data.role || 'agence', // Default role if not selected
     };
+    const response = await api.post(AUTH_ENDPOINTS.REGISTER, payload);
+    return response;
+  }
+
+  /**
+   * Verify email during registration
+   * @param {Object} data - { user_id, code }
+   */
+  async verifyRegistration({ user_id, code }) {
+    const response = await api.post(AUTH_ENDPOINTS.VERIFY_REGISTRATION, { user_id, code });
+    return response;
   }
 
   /**
    * Verify 2FA code
-   * @param {Object} data - { code, tempToken }
-   * @returns {Promise<Object>} - { verified, token }
+   * @param {Object} data - { user_id, code }
+   * @returns {Promise<Object>}
    */
-  async verify2FA({ code }) {
-    await simulateDelay(800);
-
-    if (code !== MOCK_2FA_CODE) {
-      throw new Error('Code de vérification invalide');
-    }
-
+  async verify2FA({ user_id, code }) {
+    const response = await api.post(AUTH_ENDPOINTS.VERIFY_2FA, { user_id, code });
     return {
       verified: true,
-      token: MOCK_TOKEN,
+      token: response.token,
     };
   }
 
   /**
-   * Change password (forced on first login)
-   * @param {Object} data - { currentPassword, newPassword }
-   * @returns {Promise<Object>} - { success, message }
+   * Resend 2FA code
+   * @param {Object} data - { user_id }
+   * @returns {Promise<Object>}
    */
-  async changePassword({ currentPassword, newPassword }) {
-    await simulateDelay();
+  async resend2FA({ user_id }) {
+    const response = await api.post(AUTH_ENDPOINTS.RESEND_2FA, { user_id });
+    return response;
+  }
 
-    if (currentPassword !== MOCK_PASSWORD) {
-      throw new Error('Le mot de passe actuel est incorrect');
+  /**
+   * Change password (forced or voluntary)
+   * @param {Object} data
+   * @returns {Promise<Object>}
+   */
+  async changePassword(data) {
+    // If we have a temp token, it's a forced change password, which has its own endpoint
+    if (data.isForced) {
+      // Need to pass the temp token in headers, which api.js handles via localStorage auth_token
+      // The slice should have saved the temp token as auth_token temporarily
+      return await api.post(AUTH_ENDPOINTS.FORCE_CHANGE_PASSWORD, {
+        password: data.password,
+        password_confirmation: data.password_confirmation,
+      });
     }
-
-    return {
-      success: true,
-      message: 'Mot de passe modifié avec succès',
-    };
+    
+    // Standard change password
+    return await api.post(AUTH_ENDPOINTS.CHANGE_PASSWORD, {
+      current_password: data.currentPassword,
+      password: data.password,
+      password_confirmation: data.passwordConfirmation || data.password_confirmation,
+    });
   }
 
   /**
@@ -148,32 +122,36 @@ class AuthService {
    * @returns {Promise<void>}
    */
   async logout() {
-    await simulateDelay(300);
-    // Clear tokens, session, etc.
+    try {
+      await api.post(AUTH_ENDPOINTS.LOGOUT, {});
+    } catch (e) {
+      // Ignore logout errors, just clear the local session
+    }
     return { success: true };
   }
 
   /**
-   * Refresh access token
-   * @param {string} refreshToken
-   * @returns {Promise<Object>} - { token, refreshToken }
+   * Get current authenticated user profile
+   * @returns {Promise<Object>}
    */
-  async refreshToken(refreshToken) {
-    await simulateDelay(500);
-    return {
-      token: 'mock-jwt-token-refreshed-' + Date.now(),
-      refreshToken: 'mock-refresh-token-refreshed-' + Date.now(),
-    };
+  async getCurrentUser() {
+    return await api.get(AUTH_ENDPOINTS.ME);
+  }
+  
+  /**
+   * Forgot password request
+   */
+  async forgotPassword({ email }) {
+    return await api.post(AUTH_ENDPOINTS.FORGOT_PASSWORD, { email });
   }
 
   /**
-   * Get current authenticated user profile
-   * @returns {Promise<Object>} - User profile data
+   * Reset password via token
    */
-  async getCurrentUser() {
-    await simulateDelay(500);
-    // In real implementation, this would use the stored token
-    return MOCK_USERS['admin@oriotel.com'];
+  async resetPassword({ token, email, password, password_confirmation }) {
+    return await api.post(AUTH_ENDPOINTS.RESET_PASSWORD, {
+      token, email, password, password_confirmation
+    });
   }
 }
 

@@ -35,9 +35,15 @@ export const loginSchema = z.object({
   password: z
     .string()
     .min(1, 'Le mot de passe est requis'),
-  role: z.enum([USER_ROLES.ADMIN, USER_ROLES.INTERNE, USER_ROLES.EXTERNE]),
-  userType: z.string().optional(),
   rememberMe: z.boolean().optional(),
+});
+
+// Forgot password schema
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .min(1, "L'adresse email est requise")
+    .email("Format d'email invalide"),
 });
 
 // Registration form schema
@@ -54,22 +60,32 @@ export const registerSchema = z.object({
     .string()
     .min(1, "L'adresse email est requise")
     .email("Format d'email invalide"),
+  cin: z
+    .string()
+    .min(4, "Le numéro de CIN est requis")
+    .max(20, "Le numéro de CIN est trop long"),
   phone: z
     .string()
     .min(1, 'Le numéro de téléphone est requis')
     .regex(/^(\+?\d{1,3}[-.\s]?)?\d{9,14}$/, 'Format de téléphone invalide'),
-  role: z.enum([USER_ROLES.INTERNE, USER_ROLES.EXTERNE]),
-  userType: z
+  role: z
     .string()
-    .min(1, 'Le type de compte est requis'),
-  companyName: z.string().optional(),
+    .min(1, 'Le rôle est requis'),
   reason: z
     .string()
-    .min(10, 'Veuillez décrire votre demande (min. 10 caractères)')
-    .max(500, 'La description ne peut pas dépasser 500 caractères'),
+    .max(500, 'La description ne peut pas dépasser 500 caractères')
+    .optional()
+    .or(z.literal('')),
+  password: passwordSchema,
+  passwordConfirmation: z
+    .string()
+    .min(1, 'La confirmation du mot de passe est requise'),
   acceptTerms: z
     .boolean()
     .refine((val) => val === true, "Vous devez accepter les conditions d'utilisation"),
+}).refine((data) => data.password === data.passwordConfirmation, {
+  message: 'Les mots de passe ne correspondent pas',
+  path: ['passwordConfirmation'],
 });
 
 // Force password change schema

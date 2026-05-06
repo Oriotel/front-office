@@ -3,38 +3,18 @@ import RoleList from './components/RoleList';
 import PermissionMatrix from './components/PermissionMatrix';
 import UserList from './components/UserList';
 import { Save, ShieldCheck, X } from 'lucide-react';
-import DashboardLayout from '../../components/Layout/DashboardLayout';
 import { clsx } from 'clsx';
-
-// MOCK_USERS 
-const MOCK_USERS = [
-  { id: 1, roleId: 'admin', name: 'Jean Dupont', email: 'jean.dupont@oriotel.fr', avatar: 'https://i.pravatar.cc/150?u=1', online: true },
-  { id: 2, roleId: 'admin', name: 'Marie Curie', email: 'marie.curie@oriotel.fr', avatar: 'https://i.pravatar.cc/150?u=2', online: false },
-  { id: 3, roleId: 'admin', name: 'Thomas Pesquet', email: 't.pesquet@oriotel.fr', avatar: 'https://i.pravatar.cc/150?u=3', online: true },
-  { id: 4, roleId: 'assistant', name: 'Alice Martin', email: 'a.martin@oriotel.fr', avatar: 'https://i.pravatar.cc/150?u=4', online: true },
-  { id: 5, roleId: 'assistant', name: 'Bob Durand', email: 'b.durand@oriotel.fr', avatar: 'https://i.pravatar.cc/150?u=5', online: true },
-  { id: 6, roleId: 'animator', name: 'Charlie West', email: 'c.west@oriotel.fr', avatar: 'https://i.pravatar.cc/150?u=6', online: false },
-  { id: 7, roleId: 'counter', name: 'David Smith', email: 'd.smith@oriotel.fr', avatar: 'https://i.pravatar.cc/150?u=7', online: true },
-  { id: 8, roleId: 'supervisor', name: 'Elena G.', email: 'e.gomez@oriotel.fr', avatar: 'https://i.pravatar.cc/150?u=8', online: true },
-  { id: 9, roleId: null, name: 'Lucas Martin', email: 'l.martin@oriotel.fr', avatar: 'https://i.pravatar.cc/150?u=9', online: false },
-  { id: 10, roleId: null, name: 'Sophie L.', email: 'sophie@oriotel.fr', avatar: 'https://i.pravatar.cc/150?u=10', online: true },
-];
-
-const INITIAL_ROLES_DATA = [
-  { id: 'admin', name: 'Administrateur', users: 3, color: 'bg-indigo-500' },
-  { id: 'assistant', name: 'Assistant', users: 2, color: 'bg-emerald-500' },
-  { id: 'animator', name: 'Animateur', users: 1, color: 'bg-amber-500' },
-  { id: 'counter', name: 'Compteur', users: 1, color: 'bg-rose-500' },
-  { id: 'supervisor', name: 'Superviseur', users: 1, color: 'bg-blue-500' },
-];
+import api from '../../services/api';
 
 const RolesPermissionsPage = () => {
   const [step, setStep] = useState(1);
-  const [roles, setRoles] = useState(INITIAL_ROLES_DATA);
-  const [users, setUsers] = useState(MOCK_USERS);
+  const [loading, setLoading] = useState(false);
+  const [roles, setRoles] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [roleUsersData, setRoleUsersData] = useState([]); // Users for the selected role
 
   // Single selection: string instead of array
-  const [selectedRole, setSelectedRole] = useState('admin');
+  const [selectedRole, setSelectedRole] = useState(null);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -42,18 +22,77 @@ const RolesPermissionsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newRoleName, setNewRoleName] = useState('');
 
-  const [permissions, setPermissions] = useState({
-    'Utilisateurs': { 'Lecture': true, 'Création': true, 'Modification': true },
-    'Stock': { 'Lecture': true, 'Export': true },
-  });
+  const [permissions, setPermissions] = useState({});
 
-  // Calculate roles for display dynamically
-  const displayRoles = useMemo(() => {
-    return roles.map(r => ({
-      ...r,
-      users: users.filter(u => u.roleId === r.id).length
-    }));
-  }, [roles, users]);
+  // Fetch Roles on mount
+  React.useEffect(() => {
+    fetchRoles();
+  }, []);
+
+  const fetchRoles = async () => {
+    try {
+      const response = await api.get('/v1/roles-permissions/roles');
+      if (response.data.success) {
+        const mappedRoles = response.data.roles.map(r => ({
+          ...r,
+          users: r.users_count || 0
+        }));
+        setRoles(mappedRoles);
+        // Default to first role if none selected
+        if (!selectedRole && mappedRoles.length > 0) {
+          setSelectedRole(mappedRoles[0].id);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
+
+  // Fetch users when selectedRole changes or step 2 reached
+  React.useEffect(() => {
+    if (selectedRole && step === 2) {
+      fetchRoleUsers();
+    }
+  }, [selectedRole, step]);
+
+  const fetchRoleUsers = async () => {
+    try {
+      const response = await api.get(`/v1/roles-permissions/roles/${selectedRole}/users`, {
+        params: { search: searchQuery }
+      });
+      if (response.data.success) {
+        setRoleUsersData(response.data.users);
+      }
+    } catch (error) {
+      console.error("Error fetching role users:", error);
+    }
+  };
+
+  // Fetch permissions when step 3 reached
+  React.useEffect(() => {
+    if (step === 3 && selectedRole) {
+      fetchPermissions();
+    }
+  }, [step, selectedRole, selectedUsers]);
+
+  const fetchPermissions = async () => {
+    try {
+      const response = await api.get('/v1/roles-permissions/permissions', {
+        params: {
+          role_id: selectedRole,
+          user_ids: selectedUsers.map(u => u.id)
+        }
+      });
+      if (response.data.success) {
+        setPermissions(response.data.permissions);
+      }
+    } catch (error) {
+      console.error("Error fetching permissions:", error);
+    }
+  };
+
+  // Roles for display
+  const displayRoles = roles;
 
   // Handle single role selection
   const handleSelectRole = (roleId) => {
@@ -72,16 +111,7 @@ const RolesPermissionsPage = () => {
   };
 
   // Filtered users: show users belonging to the selected role
-  const roleUsers = useMemo(() => {
-    let all = users;
-    if (searchQuery.trim() !== '') {
-      all = users.filter(u =>
-        u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        u.email.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    return all.filter(u => u.roleId === selectedRole);
-  }, [selectedRole, searchQuery, users]);
+  const roleUsers = roleUsersData;
 
   // Summary labels
   const selectedRoleName = displayRoles.find(r => r.id === selectedRole)?.name;
@@ -96,25 +126,62 @@ const RolesPermissionsPage = () => {
     }));
   };
 
-  const handleAddRole = () => {
+  const handleAddRole = async () => {
     if (newRoleName.trim() === '') return;
-    const newId = newRoleName.toLowerCase().replace(/\s+/g, '_');
-    setRoles([...roles, { id: newId, name: newRoleName, users: 0, color: 'bg-gray-700' }]);
-    setIsModalOpen(false);
-    setNewRoleName('');
-    setSelectedRole(newId);
+    try {
+      const response = await api.post('/v1/roles-permissions/roles', {
+        name: newRoleName,
+        color: 'bg-gray-700'
+      });
+      if (response.data.success) {
+        setIsModalOpen(false);
+        setNewRoleName('');
+        await fetchRoles(); // Refresh roles list
+        setSelectedRole(response.data.role.id);
+      }
+    } catch (error) {
+      console.error("Error creating role:", error);
+      const message = error.response?.data?.message || "Erreur lors de la création du rôle.";
+      const detail = error.response?.data?.error || (error.response?.data?.errors ? Object.values(error.response.data.errors).flat().join(', ') : '');
+      alert(`${message} ${detail}`);
+    }
+  };
+
+  const handleSavePermissions = async () => {
+    setLoading(true);
+    try {
+      const response = await api.post('/v1/roles-permissions/permissions/sync', {
+        role_id: selectedRole,
+        user_ids: selectedUsers.map(u => u.id),
+        permissions: permissions
+      });
+      if (response.data.success) {
+        setStep(1); // Return to step 1 as requested
+        setSelectedUsers([]);
+      }
+    } catch (error) {
+      console.error("Error saving permissions:", error);
+      alert("Erreur lors de la sauvegarde des permissions.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-8 pb-32">
         {/* Page Title */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gray-200 pb-6">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-black text-text-dark tracking-tight">Gestion des accès</h1>
-            <p className="text-gray-500 text-sm">Configuration centralisée des permissions d'équipes.</p>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-[#111827] tracking-tight">Gestion des accès</h1>
+            <p className="text-sm text-gray-500 mt-2 flex items-center gap-2">
+              <span className="bg-[#1428C9]/5 text-[#1428C9] px-3 py-1 rounded-sm font-bold text-[11px] border border-[#1428C9]/10 transition-all duration-300">
+                {displayRoles.length} rôles au total
+              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-gray-200" />
+              <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Configuration centralisée</span>
+            </p>
           </div>
-
         </div>
 
         {/* Steps indicator */}
@@ -127,7 +194,7 @@ const RolesPermissionsPage = () => {
         </div>
 
         {/* Step content */}
-        <div className="bg-white border border-gray-200 p-6 min-h-[50vh]">
+        <div className="bg-white rounded-sm border border-gray-100 p-6 min-h-[50vh] transition-all">
 
           {/* ── STEP 1 ── */}
           {step === 1 && (
@@ -202,7 +269,8 @@ const RolesPermissionsPage = () => {
                 setSearchQuery={setSearchQuery}
                 roles={roles}
                 onAssignRole={(userId, roleId) => {
-                  setUsers(prev => prev.map(u => u.id === userId ? { ...u, roleId } : u));
+                  // This could be an API call to reassign user role
+                  console.log("Assign role", userId, roleId);
                 }}
               />
 
@@ -261,9 +329,13 @@ const RolesPermissionsPage = () => {
                 <button onClick={() => setStep(2)} className="px-8 py-3 bg-gray-100 text-gray-600 text-sm font-bold uppercase tracking-wider hover:bg-gray-200 transition-colors">
                   ← Modifier la cible
                 </button>
-                <button className="px-10 py-3 bg-primary text-white text-sm font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors flex items-center gap-3">
+                <button 
+                  onClick={handleSavePermissions}
+                  disabled={loading}
+                  className="px-10 py-3 bg-primary text-white text-sm font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors flex items-center gap-3 disabled:opacity-50"
+                >
                   <Save size={18} />
-                  Sauvegarder les droits
+                  {loading ? 'Enregistrement...' : 'Sauvegarder les droits'}
                 </button>
               </div>
             </div>
@@ -302,7 +374,7 @@ const RolesPermissionsPage = () => {
           </div>
         </div>
       )}
-    </DashboardLayout>
+    </>
   );
 };
 

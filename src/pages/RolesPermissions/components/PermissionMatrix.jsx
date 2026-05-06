@@ -13,31 +13,31 @@ const ACTIONS = [
 
 const PermissionMatrix = ({ permissions, onToggle }) => {
   return (
-    <div className="bg-white border border-gray-100 overflow-hidden">
+    <div className="bg-white rounded-sm border border-gray-100 overflow-hidden transition-all">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-gray-50/80 border-b border-gray-100">
-              <th className="p-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap sticky left-0 z-10 bg-gray-50">
+          <thead className="bg-[#F8FAFC]">
+            <tr>
+              <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap sticky left-0 z-10 bg-[#F8FAFC]">
                 Modules \ Permissions
               </th>
               {MODULES.map((module) => (
-                <th key={module} className="p-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center whitespace-nowrap">
+                <th key={module} className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-center whitespace-nowrap bg-[#F8FAFC]">
                   {module}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-50">
             {ACTIONS.map((action) => (
-              <tr key={action} className="border-b border-gray-50 last:border-0 hover:bg-bg-light/50 transition-colors group">
-                <td className="p-4 text-xs font-bold text-text-dark whitespace-nowrap sticky left-0 bg-white group-hover:bg-bg-light z-10 transition-colors">
+              <tr key={action} className="transition-colors hover:bg-[#F8FAFC] group">
+                <td className="px-6 py-4 text-sm font-medium text-[#111827] whitespace-nowrap sticky left-0 bg-white group-hover:bg-[#F8FAFC] z-10 transition-colors">
                   {action}
                 </td>
                 {MODULES.map((module) => {
                   const isChecked = permissions[module]?.[action] || false;
                   return (
-                    <td key={`${module}-${action}`} className="p-4 text-center">
+                    <td key={`${module}-${action}`} className="px-6 py-4 text-center">
                       <button
                         onClick={() => onToggle(module, action)}
                         className={clsx(

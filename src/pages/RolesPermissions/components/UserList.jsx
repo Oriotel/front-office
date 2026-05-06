@@ -28,20 +28,20 @@ const UserList = ({ users, selectedUserIds, onToggleUser, searchQuery, setSearch
             Collaborateurs ({users.length})
           </h3>
           {users.length === 0 ? (
-            <div className="p-4 bg-gray-50 border border-dashed border-gray-200 text-center">
-              <p className="text-xs text-gray-500 font-medium">Aucun collaborateur trouvé.</p>
+            <div className="bg-white rounded-sm border border-gray-100 p-12 mt-8 text-center">
+              <p className="text-gray-400 font-medium">Aucun collaborateur trouvé</p>
             </div>
           ) : (
-            <div className="border border-gray-200">
+            <div className="bg-white rounded-sm border border-gray-100 overflow-hidden transition-all">
               <table className="w-full text-left border-collapse">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-[#F8FAFC]">
                   <tr>
-                    <th className="w-12 p-3"></th>
-                    <th className="p-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Collaborateur</th>
-                    <th className="p-3 text-xs font-bold text-gray-500 uppercase tracking-wider text-right pr-10">Rôle / Action</th>
+                    <th className="w-12 px-6 py-4"></th>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Utilisateur</th>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right pr-6">Rôle / Action</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-gray-50">
                   {users.map(user => (
                     <UserRow
                       key={user.id}
@@ -88,11 +88,11 @@ const UserRow = ({ user, isSelected, onToggle, roles, onAssignRole }) => {
     <tr 
       onClick={onToggle}
       className={clsx(
-        "group cursor-pointer transition-colors border-b border-gray-100 last:border-0",
-        isSelected ? "bg-primary/5" : "bg-white hover:bg-gray-50"
+        "group cursor-pointer transition-colors hover:bg-[#F8FAFC]",
+        isSelected ? "bg-primary/5" : "bg-white"
       )}
     >
-      <td className="p-3 text-center w-12">
+      <td className="w-12 px-6 py-4 text-center">
         <div className={clsx(
           "w-5 h-5 mx-auto flex items-center justify-center border-2 transition-all",
           isSelected
@@ -102,7 +102,7 @@ const UserRow = ({ user, isSelected, onToggle, roles, onAssignRole }) => {
           {isSelected && <Check size={12} className="text-white stroke-[3]" />}
         </div>
       </td>
-      <td className="p-3">
+      <td className="px-6 py-4">
         <div className="flex items-center gap-3">
           <div className="relative shrink-0">
             <img
@@ -129,7 +129,7 @@ const UserRow = ({ user, isSelected, onToggle, roles, onAssignRole }) => {
           </div>
         </div>
       </td>
-      <td className="p-3 relative text-right pr-6" onClick={e => e.stopPropagation()}>
+      <td className="px-6 py-4 relative text-right" onClick={e => e.stopPropagation()}>
         <div ref={dropdownRef} className="inline-block text-left">
           <button
             onClick={() => setIsOpen(!isOpen)}

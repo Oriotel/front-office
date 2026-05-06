@@ -4,7 +4,7 @@ import UserTableRow from './UserTableRow';
 import UserCard from './UserCard';
 import Button from '../common/Button';
 
-const UserTable = ({ users, onEdit, onView }) => {
+const UserTable = ({ users, onEdit, onView, onDelete }) => {
   if (users.length === 0) {
     return (
       <div className="bg-white rounded-sm border border-gray-100 p-12 mt-8 text-center">
@@ -23,14 +23,15 @@ const UserTable = ({ users, onEdit, onView }) => {
             user={user}
             onEdit={onEdit}
             onView={onView}
+            onDelete={onDelete}
           />
         ))}
       </div>
 
       {/* Desktop View (Table) */}
-      <div className="hidden lg:block bg-white rounded-sm border border-gray-100 overflow-hidden transition-all">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+      <div className="hidden lg:block bg-white rounded-sm border border-gray-100 transition-all shadow-sm max-w-full overflow-hidden">
+        <div className="overflow-x-auto lg:overflow-x-visible">
+          <table className="w-full text-left border-collapse table-fixed lg:table-auto">
             <UserTableHeader />
             <tbody className="divide-y divide-gray-50">
               {users.map((user) => (
@@ -39,6 +40,7 @@ const UserTable = ({ users, onEdit, onView }) => {
                   user={user}
                   onEdit={onEdit}
                   onView={onView}
+                  onDelete={onDelete}
                 />
               ))}
             </tbody>

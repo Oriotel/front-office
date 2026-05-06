@@ -1,14 +1,14 @@
 export const USER_ROLES = {
-  ADMIN: 'Administrateur',
-  ASSISTANT: 'Assistant',
-  ANIMATEUR: 'Animateur',
-  SUPERVISEUR: 'Superviseur',
+  ADMIN: 'admin',
+  ASSISTANT: 'assistant',
+  ANIMATEUR: 'animateur',
+  SUPERVISEUR: 'superviseur',
 };
 
 export const USER_STATUS = {
   ACTIVE: 'Actif',
   INACTIVE: 'Inactif',
-  SUSPENDED: 'Suspendu',
+  PENDING: 'En attente',
 };
 
 export const ROLE_STYLES = {
@@ -21,5 +21,5 @@ export const ROLE_STYLES = {
 export const STATUS_STYLES = {
   [USER_STATUS.ACTIVE]: 'bg-green-50 text-green-700 border-green-100',
   [USER_STATUS.INACTIVE]: 'bg-gray-50 text-gray-700 border-gray-100',
-  [USER_STATUS.SUSPENDED]: 'bg-red-50 text-red-700 border-red-100',
+  [USER_STATUS.PENDING]: 'bg-yellow-50 text-yellow-700 border-yellow-100',
 };

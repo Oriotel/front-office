@@ -163,7 +163,7 @@ const UserDrawer = ({ isOpen, onClose, onSubmit, initialData }) => {
       {/* Drawer */}
       <div
         className={cn(
-          "fixed top-0 right-0 h-full w-[500px] bg-white z-[70] border-l border-gray-100 transition-transform duration-500 ease-in-out flex flex-col",
+          "fixed top-0 right-0 h-full w-full max-w-[500px] bg-white z-[70] border-l border-gray-100 transition-transform duration-500 ease-in-out flex flex-col",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >

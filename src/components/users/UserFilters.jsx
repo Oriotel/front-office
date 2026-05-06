@@ -44,18 +44,18 @@ const UserFilters = ({ userCount, searchQuery, onSearchChange, filters, onFilter
         />
 
         {/* Filters row */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
           <Select
             options={roleOptions}
             value={filters.role}
             onChange={(e) => onFilterChange('role', e.target.value)}
-            containerClassName="min-w-[180px]"
+            containerClassName="flex-1 md:min-w-[180px] min-w-0"
           />
           <Select
             options={statusOptions}
             value={filters.statut}
             onChange={(e) => onFilterChange('statut', e.target.value)}
-            containerClassName="min-w-[180px]"
+            containerClassName="flex-1 md:min-w-[180px] min-w-0"
           />
 
           {/* Date filter using our premium Input component */}
@@ -64,14 +64,14 @@ const UserFilters = ({ userCount, searchQuery, onSearchChange, filters, onFilter
             icon={Calendar}
             value={filters.dateCreation || ''}
             onChange={(e) => onFilterChange('dateCreation', e.target.value)}
-            containerClassName="min-w-[180px]"
+            containerClassName="flex-1 md:min-w-[180px] min-w-0"
           />
 
           {/* Prominent Reset button */}
           <button
             onClick={onReset}
             title="Réinitialiser les filtres"
-            className="flex items-center justify-center w-12 h-12 bg-[#1428C9] text-white rounded-sm hover:bg-[#1428C9]/90 active:scale-90 transition-all duration-300 cubic-bezier(0.4, 0, 0.2, 1)"
+            className="flex items-center justify-center w-12 h-12 bg-[#1428C9] text-white rounded-sm hover:bg-[#1428C9]/90 active:scale-90 transition-all duration-300 cubic-bezier(0.4, 0, 0.2, 1) shrink-0"
           >
             <RotateCcw size={18} />
           </button>

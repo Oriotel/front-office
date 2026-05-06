@@ -3,6 +3,7 @@ import UserTable from '../components/users/UserTable';
 import UserFilters from '../components/users/UserFilters';
 import UserDrawer from '../components/users/UserDrawer';
 import UserDetailsModal from '../components/users/UserDetailsModal';
+import ConfirmationModal from '../components/users/ConfirmationModal';
 import { useUsers } from '../hooks/useUsers';
 
 const UsersPage = () => {
@@ -15,13 +16,16 @@ const UsersPage = () => {
     setFilters,
     addUser,
     updateUser,
+    deleteUser,
     loading: isLoading,
     error,
   } = useUsers();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   const handleNewUser = () => {
     setSelectedUser(null);
@@ -36,6 +40,19 @@ const UsersPage = () => {
   const handleViewUser = (user) => {
     setSelectedUser(user);
     setIsDetailsOpen(true);
+  };
+
+  const handleDeleteClick = (user) => {
+    setUserToDelete(user);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (userToDelete) {
+      await deleteUser(userToDelete.id);
+      setIsDeleteModalOpen(false);
+      setUserToDelete(null);
+    }
   };
 
   const handleFilterChange = (key, value) => {
@@ -85,6 +102,7 @@ const UsersPage = () => {
           users={users}
           onEdit={handleEditUser}
           onView={handleViewUser}
+          onDelete={handleDeleteClick}
           isLoading={isLoading}
         />
       </div>
@@ -100,6 +118,16 @@ const UsersPage = () => {
         isOpen={isDetailsOpen}
         onClose={() => setIsDetailsOpen(false)}
         user={selectedUser}
+      />
+
+      <ConfirmationModal 
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Supprimer l'utilisateur"
+        message={`Êtes-vous sûr de vouloir supprimer l'utilisateur ${userToDelete?.prenom} ${userToDelete?.nom} ? Cette action est irréversible.`}
+        confirmText="Supprimer"
+        type="danger"
       />
     </div>
   );

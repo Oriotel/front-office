@@ -12,7 +12,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
         onClick={onClose}
       />
 
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] bg-white z-[90] rounded-sm transition-all duration-300 animate-in zoom-in-95 p-6">
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-[400px] bg-white z-[90] rounded-sm transition-all duration-300 animate-in zoom-in-95 p-6">
         <div className="flex items-start gap-4">
           <div className={cn(
             "p-3 rounded-sm",

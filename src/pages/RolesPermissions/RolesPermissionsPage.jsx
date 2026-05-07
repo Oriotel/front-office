@@ -114,7 +114,7 @@ const RolesPermissionsPage = () => {
   const roleUsers = roleUsersData;
 
   // Summary labels
-  const selectedRoleName = displayRoles.find(r => r.id === selectedRole)?.name;
+  const selectedRoleName = displayRoles.find(r => r.id == selectedRole)?.name;
 
   const handleTogglePermission = (module, action) => {
     setPermissions(prev => ({
@@ -297,7 +297,7 @@ const RolesPermissionsPage = () => {
                   </h2>
                   <p className="text-xs text-gray-500 mt-1">
                     {selectedUsers.length > 0
-                      ? `Appliqué à : ${selectedUsers.map(u => u.name.split(' ')[0]).join(', ')}`
+                      ? `Appliqué à : ${selectedUsers.map(u => (u.name || 'Utilisateur').split(' ')[0]).join(', ')}`
                       : `Appliqué au rôle : ${selectedRoleName}`}
                   </p>
                 </div>
@@ -307,8 +307,8 @@ const RolesPermissionsPage = () => {
                   {selectedUsers.length > 0
                     ? selectedUsers.map(u => (
                       <span key={u.id} className="flex items-center gap-2 px-3 py-1 bg-primary/5 border border-primary/20 text-primary text-[10px] font-bold uppercase">
-                        <img src={u.avatar} className="w-4 h-4 object-cover" alt="" />
-                        {u.name.split(' ')[0]}
+                        <img src={u.avatar || ''} className="w-4 h-4 object-cover" alt="" />
+                        {(u.name || 'Utilisateur').split(' ')[0]}
                       </span>
                     ))
                     : (

@@ -1,9 +1,7 @@
 import api from './api';
 
 /**
- * Service for managing user activity history logs.
- * Calls identity-nginx directly on port 8082 (baseURL: http://localhost:8082/api)
- * Full URL: http://localhost:8082/api/v1/history
+ * Service for activity history (REAL API)
  */
 const historyService = {
   getHistory: async (params = {}) => {
@@ -23,7 +21,7 @@ const historyService = {
 
   getDetail: async (id) => {
     const response = await api.get(`/v1/history/${id}`);
-    return response.data;
+    return response.data.data;
   }
 };
 

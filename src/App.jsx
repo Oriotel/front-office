@@ -1,7 +1,11 @@
 
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Suspense, lazy } from 'react'
+
 import RolesPermissionsPage from './pages/RolesPermissions/RolesPermissionsPage'
+
+
+
 import GuestGuard from '@/guards/GuestGuard'
 import AuthGuard from '@/guards/AuthGuard'
 
@@ -53,9 +57,11 @@ function App() {
           <Route index element={<Navigate to="/users" replace />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="settings" element={<div className="p-8"><h1 className="text-2xl font-bold">Paramètres</h1></div>} />
+
           <Route path="/" element={<RolesPermissionsPage />} />
           <Route path="/roles-permissions" element={<RolesPermissionsPage />} />
           <Route path="*" element={<RolesPermissionsPage />} />
+
         </Route>
 
         <Route path="/dashboard" element={<Navigate to="/users" replace />} />

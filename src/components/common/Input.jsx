@@ -1,12 +1,13 @@
+
 import { cn } from '../../utils/cn';
 
-const Input = ({ 
-  label, 
-  error, 
+const Input = ({
+  label,
+  error,
   icon: Icon,
-  className, 
+  className,
   containerClassName,
-  ...props 
+  ...props
 }) => {
   return (
     <div className={cn('space-y-1.5', containerClassName)}>

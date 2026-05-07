@@ -40,14 +40,14 @@ export const useUsers = () => {
   }, [filters, fetchUsers]);
 
   // Handle search with debounce
-  const handleSearchChange = (query) => {
+  const handleSearchChange = useCallback((query) => {
     setSearchQuery(query);
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
     
     debounceTimer.current = setTimeout(() => {
       fetchUsers(filters, query);
     }, 500);
-  };
+  }, [filters, fetchUsers]);
 
   const addUser = useCallback(async (userData) => {
     try {
@@ -98,16 +98,28 @@ export const useUsers = () => {
   }, []);
 
   const toggleUserStatus = useCallback(async (id) => {
-    const user = users.find(u => u.id === id);
-    if (!user) return;
-
-    const newStatus = user.statut === USER_STATUS.ACTIVE ? USER_STATUS.INACTIVE : USER_STATUS.ACTIVE;
     try {
-      await updateUser(id, { statut: newStatus });
+      setUsers(prev => {
+        const user = prev.find(u => u.id === id);
+        if (!user) return prev;
+        
+        const newStatus = user.statut === USER_STATUS.ACTIVE ? USER_STATUS.INACTIVE : USER_STATUS.ACTIVE;
+        
+        // Optimistic update
+        const updatedUsers = prev.map(u => u.id === id ? { ...u, statut: newStatus } : u);
+        
+        // We still need to call the API
+        userService.updateUser(id, { statut: newStatus }).catch(err => {
+          console.error('Failed to sync status:', err);
+          // Rollback logic could go here if needed
+        });
+        
+        return updatedUsers;
+      });
     } catch (err) {
       console.error(err);
     }
-  }, [users, updateUser]);
+  }, []);
 
   return {
     users: users,

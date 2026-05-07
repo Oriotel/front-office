@@ -1,10 +1,11 @@
+import { memo } from 'react';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 import Badge from '../common/Badge';
 import Button from '../common/Button';
 import { cn } from '../../utils/cn';
 import { ROLE_STYLES, STATUS_STYLES } from '../../constants/users';
 
-const UserTableRow = ({ user, onEdit, onView, onDelete }) => {
+const UserTableRow = memo(({ user, onEdit, onView, onDelete }) => {
   return (
     <tr className="hover:bg-[#F0F3FF]/50 hover:scale-[1.01] hover:z-10 transition-all duration-300 ease-in-out group border-b border-gray-50 last:border-0 relative animate-in fade-in slide-in-up">
       {/* 1. Photo */}
@@ -90,6 +91,6 @@ const UserTableRow = ({ user, onEdit, onView, onDelete }) => {
       </td>
     </tr>
   );
-};
+});
 
 export default UserTableRow;

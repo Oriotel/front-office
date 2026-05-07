@@ -1,13 +1,14 @@
+import { memo } from 'react';
 import { Eye, Pencil, Phone, Mail, Hash, MapPin, Trash2 } from 'lucide-react';
 import Badge from '../common/Badge';
 import Button from '../common/Button';
 import { cn } from '../../utils/cn';
 import { ROLE_STYLES, STATUS_STYLES } from '../../constants/users';
 
-const UserCard = ({ user, onEdit, onView, onDelete }) => {
+const UserCard = memo(({ user, onEdit, onView, onDelete }) => {
   return (
     <div className="bg-white p-5 rounded-sm border border-gray-100 transition-all group relative overflow-hidden">
-      {/* ... top section ... */}
+      {/* top section */}
       <div className="flex items-start gap-4 mb-5">
         <div className="relative">
           {user.photo ? (
@@ -96,6 +97,6 @@ const UserCard = ({ user, onEdit, onView, onDelete }) => {
       </div>
     </div>
   );
-};
+});
 
 export default UserCard;

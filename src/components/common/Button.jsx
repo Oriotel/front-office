@@ -1,7 +1,8 @@
+import { memo } from 'react';
 import { cn } from '../../utils/cn';
 import { Loader2 } from 'lucide-react';
 
-const Button = ({ 
+const Button = memo(({ 
   children, 
   variant = 'primary', 
   size = 'md', 
@@ -49,6 +50,6 @@ const Button = ({
       {children}
     </button>
   );
-};
+});
 
 export default Button;

@@ -1,7 +1,8 @@
+import { memo } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
-const Select = ({ 
+const Select = memo(({ 
   label, 
   options = [], 
   error, 
@@ -44,6 +45,6 @@ const Select = ({
       )}
     </div>
   );
-};
+});
 
 export default Select;

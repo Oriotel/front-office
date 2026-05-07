@@ -1,6 +1,7 @@
+import { memo } from 'react';
 import { cn } from '../../utils/cn';
 
-const Input = ({ 
+const Input = memo(({ 
   label, 
   error, 
   icon: Icon,
@@ -41,6 +42,6 @@ const Input = ({
       )}
     </div>
   );
-};
+});
 
 export default Input;

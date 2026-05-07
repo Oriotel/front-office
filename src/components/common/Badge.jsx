@@ -1,6 +1,7 @@
+import { memo } from 'react';
 import { cn } from '../../utils/cn';
 
-const Badge = ({ children, variant = 'default', className }) => {
+const Badge = memo(({ children, variant = 'default', className }) => {
   const variants = {
     default: 'bg-gray-50 text-gray-700 border-gray-100',
     success: 'bg-green-50 text-green-700 border-green-100',
@@ -19,6 +20,6 @@ const Badge = ({ children, variant = 'default', className }) => {
       {children}
     </span>
   );
-};
+});
 
 export default Badge;

@@ -163,45 +163,45 @@ const UserDrawer = ({ isOpen, onClose, onSubmit, initialData }) => {
       {/* Drawer */}
       <div
         className={cn(
-          "fixed top-0 right-0 h-full w-full max-w-[500px] bg-white z-[70] border-l border-gray-100 transition-transform duration-500 ease-in-out flex flex-col",
+          "fixed top-0 right-0 h-full w-full sm:max-w-[500px] bg-white z-[70] border-l border-gray-100 transition-transform duration-500 ease-in-out flex flex-col",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
         {/* Header */}
-        <div className="p-8 flex items-center justify-between border-b border-gray-50">
-          <h2 className="text-2xl font-bold text-[#111827]">
+        <div className="p-6 md:p-8 flex items-center justify-between border-b border-gray-50">
+          <h2 className="text-xl md:text-2xl font-bold text-[#111827]">
             {initialData ? 'Modifier l\'utilisateur' : 'Créer un utilisateur'}
           </h2>
           <Button variant="ghost" size="sm" onClick={onClose} icon={X} />
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-8 pb-8 space-y-6 pt-4">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 md:px-8 pb-8 space-y-6 pt-4">
           
           {/* Enhanced Photo Upload */}
-          <div className="flex flex-col items-center gap-4 py-6">
+          <div className="flex flex-col items-center gap-4 py-4 md:py-6">
             <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
               {photoPreview ? (
                 <img 
                   src={photoPreview} 
                   alt="Preview" 
-                  className="w-28 h-28 rounded-sm object-cover border-4 border-white group-hover:brightness-90 transition-all"
+                  className="w-24 h-24 md:w-28 md:h-28 rounded-sm object-cover border-4 border-white group-hover:brightness-90 transition-all"
                 />
               ) : (
-                <div className="w-28 h-28 border-2 border-dashed border-slate-200 rounded-sm flex flex-col items-center justify-center text-slate-400 bg-slate-50 group-hover:bg-slate-100 transition-colors">
-                  <Camera size={32} strokeWidth={1.5} />
+                <div className="w-24 h-24 md:w-28 md:h-28 border-2 border-dashed border-slate-200 rounded-sm flex flex-col items-center justify-center text-slate-400 bg-slate-50 group-hover:bg-slate-100 transition-colors">
+                  <Camera size={28} strokeWidth={1.5} />
                   <span className="text-[10px] font-bold mt-2 uppercase tracking-widest">Choisir</span>
                 </div>
               )}
               
               <div className="absolute -bottom-2 -right-2 flex gap-1">
-                <div className="w-8 h-8 rounded-sm bg-[#1428C9] text-white flex items-center justify-center hover:scale-110 transition-transform">
+                <div className="w-8 h-8 rounded-sm bg-[#1428C9] text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg">
                   <Upload size={14} />
                 </div>
                 {formData.photo && (
                   <button 
                     type="button" 
                     onClick={(e) => { e.stopPropagation(); removePhoto(); }}
-                    className="w-8 h-8 rounded-sm bg-red-500 text-white flex items-center justify-center hover:scale-110 transition-transform"
+                    className="w-8 h-8 rounded-sm bg-red-500 text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
                   >
                     <Trash2 size={14} />
                   </button>
@@ -219,19 +219,19 @@ const UserDrawer = ({ isOpen, onClose, onSubmit, initialData }) => {
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Photo de profil</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input label="Nom" name="nom" value={formData.nom} onChange={handleChange} placeholder="Dupont" required />
             <Input label="Prénom" name="prenom" value={formData.prenom} onChange={handleChange} placeholder="Jean" required />
           </div>
 
           <Input label="Email professionnel" type="email" name="email" value={formData.email} onChange={handleChange} placeholder="exemple@oriotel.com" required />
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input label="Téléphone" name="telephone" value={formData.telephone} onChange={handleChange} placeholder="+33..." />
             <Input label="CIN / Identité" name="cin" value={formData.cin} onChange={handleChange} placeholder="AB123456" />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input label="Date de naissance" type="date" name="dateNaissance" value={formData.dateNaissance} onChange={handleChange} />
             <Input label="Adresse" name="adresse" value={formData.adresse} onChange={handleChange} placeholder="Ville, Code Postal" />
           </div>

@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback, useMemo, lazy, Suspense } from 'react';
 import UserTable from '../components/users/UserTable';
 import UserFilters from '../components/users/UserFilters';
-import UserDrawer from '../components/users/UserDrawer';
-import UserDetailsModal from '../components/users/UserDetailsModal';
-import ConfirmationModal from '../components/users/ConfirmationModal';
 import { useUsers } from '../hooks/useUsers';
+
+// Lazy load heavy components
+const UserDrawer = lazy(() => import('../components/users/UserDrawer'));
+const UserDetailsModal = lazy(() => import('../components/users/UserDetailsModal'));
+const ConfirmationModal = lazy(() => import('../components/users/ConfirmationModal'));
 
 const UsersPage = () => {
   const {
@@ -27,54 +29,50 @@ const UsersPage = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [userToDelete, setUserToDelete] = useState(null);
 
-  const handleNewUser = () => {
+  const handleNewUser = useCallback(() => {
     setSelectedUser(null);
     setIsDrawerOpen(true);
-  };
+  }, []);
 
-  const handleEditUser = (user) => {
+  const handleEditUser = useCallback((user) => {
     setSelectedUser(user);
     setIsDrawerOpen(true);
-  };
+  }, []);
 
-  const handleViewUser = (user) => {
+  const handleViewUser = useCallback((user) => {
     setSelectedUser(user);
     setIsDetailsOpen(true);
-  };
+  }, []);
 
-  const handleDeleteClick = (user) => {
+  const handleDeleteClick = useCallback((user) => {
     setUserToDelete(user);
     setIsDeleteModalOpen(true);
-  };
+  }, []);
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = useCallback(async () => {
     if (userToDelete) {
       await deleteUser(userToDelete.id);
       setIsDeleteModalOpen(false);
       setUserToDelete(null);
     }
-  };
+  }, [userToDelete, deleteUser]);
 
-  const handleFilterChange = (key, value) => {
+  const handleFilterChange = useCallback((key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
-  };
+  }, [setFilters]);
 
-  const handleResetFilters = () => {
+  const handleResetFilters = useCallback(() => {
     setSearchQuery('');
     setFilters({ role: '', statut: '', dateCreation: '' });
-  };
+  }, [setSearchQuery, setFilters]);
 
-  const handleDrawerSubmit = async (data) => {
+  const handleDrawerSubmit = useCallback(async (data) => {
     if (selectedUser) {
-      // Debug: log what we're sending
-      if (data instanceof FormData) {
-        console.log('[Update] User ID:', selectedUser.id, 'Email being sent:', data.get('email'));
-      }
       await updateUser(selectedUser.id, data);
     } else {
       await addUser(data);
     }
-  };
+  }, [selectedUser, updateUser, addUser]);
 
   return (
     <div className="w-full mx-auto pb-12 space-y-8">
@@ -83,7 +81,8 @@ const UsersPage = () => {
           {error}
         </div>
       )}
-      {/* Filters section with staggered entry */}
+      
+      {/* Filters section */}
       <div className="animate-in fade-in slide-in-up duration-500">
         <UserFilters 
           userCount={totalCount}
@@ -96,7 +95,7 @@ const UsersPage = () => {
         />
       </div>
       
-      {/* Table section with slightly delayed entry */}
+      {/* Table section */}
       <div className="animate-in fade-in slide-in-up duration-700 delay-150">
         <UserTable
           users={users}
@@ -107,28 +106,36 @@ const UsersPage = () => {
         />
       </div>
 
-      <UserDrawer 
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        onSubmit={handleDrawerSubmit}
-        initialData={selectedUser}
-      />
+      <Suspense fallback={null}>
+        {isDrawerOpen && (
+          <UserDrawer 
+            isOpen={isDrawerOpen}
+            onClose={() => setIsDrawerOpen(false)}
+            onSubmit={handleDrawerSubmit}
+            initialData={selectedUser}
+          />
+        )}
 
-      <UserDetailsModal 
-        isOpen={isDetailsOpen}
-        onClose={() => setIsDetailsOpen(false)}
-        user={selectedUser}
-      />
+        {isDetailsOpen && (
+          <UserDetailsModal 
+            isOpen={isDetailsOpen}
+            onClose={() => setIsDetailsOpen(false)}
+            user={selectedUser}
+          />
+        )}
 
-      <ConfirmationModal 
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={handleConfirmDelete}
-        title="Supprimer l'utilisateur"
-        message={`Êtes-vous sûr de vouloir supprimer l'utilisateur ${userToDelete?.prenom} ${userToDelete?.nom} ? Cette action est irréversible.`}
-        confirmText="Supprimer"
-        type="danger"
-      />
+        {isDeleteModalOpen && (
+          <ConfirmationModal 
+            isOpen={isDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            onConfirm={handleConfirmDelete}
+            title="Supprimer l'utilisateur"
+            message={`Êtes-vous sûr de vouloir supprimer l'utilisateur ${userToDelete?.prenom} ${userToDelete?.nom} ? Cette action est irréversible.`}
+            confirmText="Supprimer"
+            type="danger"
+          />
+        )}
+      </Suspense>
     </div>
   );
 };

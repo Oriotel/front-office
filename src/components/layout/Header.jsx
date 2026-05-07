@@ -1,11 +1,11 @@
-import { Bell, Search, Globe, ChevronRight, Users, LogOut, ChevronDown } from 'lucide-react';
+import { Bell, Search, Globe, ChevronRight, Users, LogOut, ChevronDown, Menu } from 'lucide-react';
 import { useLocation, Link } from 'react-router-dom';
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Avatar from "@radix-ui/react-avatar";
 import Button from '../common/Button';
 import Input from '../common/Input';
 
-const Header = () => {
+const Header = ({ onMenuClick }) => {
   const location = useLocation();
   const pathnames = location.pathname.split('/').filter((x) => x);
 
@@ -18,28 +18,38 @@ const Header = () => {
   return (
     <header className="min-h-[4rem] py-3 lg:py-0 bg-white border-b border-gray-100 sticky top-0 z-40 px-4 md:px-6 lg:px-8">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:h-16">
-        {/* Left: Breadcrumb */}
-        <nav className="flex items-center gap-3 text-sm font-medium overflow-x-auto whitespace-nowrap no-scrollbar py-1">
-          <Link to="/" className="text-gray-500 hover:text-[#1428C9] transition-all duration-200 shrink-0 font-semibold">Accueil</Link>
-          {pathnames.map((value, index) => {
-            const last = index === pathnames.length - 1;
-            const to = `/${pathnames.slice(0, index + 1).join('/')}`;
-            const name = breadcrumbMap[value] || value.charAt(0).toUpperCase() + value.slice(1);
+        {/* Left: Menu Toggle & Breadcrumb */}
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="lg:hidden p-2 -ml-2" 
+            onClick={onMenuClick}
+            icon={Menu}
+          />
+          
+          <nav className="flex items-center gap-3 text-sm font-medium overflow-x-auto whitespace-nowrap no-scrollbar py-1">
+            <Link to="/" className="text-gray-500 hover:text-[#1428C9] transition-all duration-200 shrink-0 font-semibold">Accueil</Link>
+            {pathnames.map((value, index) => {
+              const last = index === pathnames.length - 1;
+              const to = `/${pathnames.slice(0, index + 1).join('/')}`;
+              const name = breadcrumbMap[value] || value.charAt(0).toUpperCase() + value.slice(1);
 
-            return (
-              <div key={to} className="flex items-center gap-3 shrink-0 animate-in fade-in slide-in-right" style={{ animationDelay: `${index * 50}ms` }}>
-                <ChevronRight size={14} className="text-gray-300" />
-                {last ? (
-                  <span className="font-bold text-[#111827]">{name}</span>
-                ) : (
-                  <Link to={to} className="text-gray-500 hover:text-[#1428C9] transition-all duration-200 font-semibold">
-                    {name}
-                  </Link>
-                )}
-              </div>
-            );
-          })}
-        </nav>
+              return (
+                <div key={to} className="flex items-center gap-3 shrink-0 animate-in fade-in slide-in-right" style={{ animationDelay: `${index * 50}ms` }}>
+                  <ChevronRight size={14} className="text-gray-300" />
+                  {last ? (
+                    <span className="font-bold text-[#111827]">{name}</span>
+                  ) : (
+                    <Link to={to} className="text-gray-500 hover:text-[#1428C9] transition-all duration-200 font-semibold">
+                      {name}
+                    </Link>
+                  )}
+                </div>
+              );
+            })}
+          </nav>
+        </div>
 
         {/* Right: Actions */}
         <div className="flex items-center justify-between lg:justify-end gap-2 md:gap-4 w-full lg:w-auto">

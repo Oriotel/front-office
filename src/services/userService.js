@@ -1,5 +1,26 @@
 import api from './api';
 
+const mapUserFromApi = (user) => ({
+  ...user,
+  dateCreation: user.date_creation,
+  dateNaissance: user.date_naissance,
+});
+
+const mapUserToApi = (userData) => {
+  if (userData instanceof FormData) {
+    if (userData.has('dateNaissance')) {
+      userData.append('date_naissance', userData.get('dateNaissance'));
+      userData.delete('dateNaissance');
+    }
+    return userData;
+  }
+  
+  return {
+    ...userData,
+    date_naissance: userData.dateNaissance,
+  };
+};
+
 /**
  * Service for managing users.
  * Calls identity-nginx on port 8082 (baseURL: http://localhost:8082/api)
@@ -8,36 +29,42 @@ import api from './api';
 export const userService = {
   getUsers: async (params = {}) => {
     const response = await api.get('/v1/users', { params });
-    return response.data; // UserResource collection returns { data: [...] }
+    // UserResource collection returns { data: [...] }
+    return {
+      data: response.data.data.map(mapUserFromApi),
+      total: response.data.meta?.total || response.data.data.length
+    };
   },
 
   getUser: async (id) => {
     const response = await api.get(`/v1/users/${id}`);
-    return response.data.data;
+    return mapUserFromApi(response.data.data);
   },
 
   createUser: async (userData) => {
-    const config = userData instanceof FormData 
+    const mappedData = mapUserToApi(userData);
+    const config = mappedData instanceof FormData 
       ? { headers: { 'Content-Type': 'multipart/form-data' } }
       : {};
       
-    const response = await api.post('/v1/users', userData, config);
-    return response.data.data;
+    const response = await api.post('/v1/users', mappedData, config);
+    return mapUserFromApi(response.data.data);
   },
 
   updateUser: async (id, userData) => {
-    const config = userData instanceof FormData 
+    const mappedData = mapUserToApi(userData);
+    const config = mappedData instanceof FormData 
       ? { headers: { 'Content-Type': 'multipart/form-data' } }
       : {};
       
-    if (userData instanceof FormData) {
-      userData.append('_method', 'PUT');
-      const response = await api.post(`/v1/users/${id}`, userData, config);
-      return response.data.data;
+    if (mappedData instanceof FormData) {
+      mappedData.append('_method', 'PUT');
+      const response = await api.post(`/v1/users/${id}`, mappedData, config);
+      return mapUserFromApi(response.data.data);
     }
 
-    const response = await api.put(`/v1/users/${id}`, userData);
-    return response.data.data;
+    const response = await api.put(`/v1/users/${id}`, mappedData);
+    return mapUserFromApi(response.data.data);
   },
 
   deleteUser: async (id) => {

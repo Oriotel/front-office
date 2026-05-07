@@ -22,7 +22,7 @@ const LoadingSpinner = () => (
       <div className="auth-loading-dot"></div>
     </div>
   </div>
-) 
+)
 
 function App() {
   return (

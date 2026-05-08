@@ -1,7 +1,6 @@
 import { useForm } from 'react-hook-form';
-import { useState, useRef } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Mail, User, Phone, FileText, CheckCircle, ArrowLeft, CreditCard, Lock, Briefcase } from 'lucide-react';
+import { Mail, User, Phone, FileText, CreditCard, Lock, Briefcase } from 'lucide-react';
 import { registerSchema } from '@/validators/authValidators';
 import Input from '@/components/common/Input';
 import Button from '@/components/common/Button';
@@ -18,6 +17,7 @@ const RegisterForm = () => {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(registerSchema),
@@ -116,6 +116,7 @@ const RegisterForm = () => {
             error={errors.cin?.message}
             {...register('cin')}
           />
+
           <div className="auth-input-group">
             <label htmlFor="register-role" className="auth-input-label">
               Rôle

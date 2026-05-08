@@ -62,8 +62,8 @@ export const registerSchema = z.object({
     .email("Format d'email invalide"),
   cin: z
     .string()
-    .min(4, "Le numéro de CIN est requis")
-    .max(20, "Le numéro de CIN est trop long"),
+    .min(4, 'Le numéro de CIN est requis')
+    .max(20, 'Le numéro de CIN est trop long'),
   phone: z
     .string()
     .min(1, 'Le numéro de téléphone est requis')

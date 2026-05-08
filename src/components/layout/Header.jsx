@@ -53,7 +53,7 @@ const Header = ({ onMenuClick }) => {
 
         {/* Right: Actions */}
         <div className="flex items-center justify-between lg:justify-end gap-2 md:gap-4 w-full lg:w-auto">
-          <Input 
+          <Input
             icon={Search}
             placeholder="Rechercher..."
             containerClassName="flex-1 lg:w-80 lg:flex-none"
@@ -92,7 +92,7 @@ const Header = ({ onMenuClick }) => {
                 </DropdownMenu.Trigger>
 
                 <DropdownMenu.Portal>
-                  <DropdownMenu.Content 
+                  <DropdownMenu.Content
                     className="z-[100] w-64 bg-white rounded-sm border border-gray-100 p-2 animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-300 cubic-bezier(0.4, 0, 0.2, 1)"
                     sideOffset={12}
                     align="end"
@@ -120,6 +120,7 @@ const Header = ({ onMenuClick }) => {
               </DropdownMenu.Root>
             </div>
           </div>
+
         </div>
       </div>
     </header>

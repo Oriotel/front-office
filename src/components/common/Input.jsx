@@ -1,13 +1,15 @@
-import { memo } from 'react';
+
+
 import { cn } from '../../utils/cn';
 
-const Input = memo(({ 
-  label, 
-  error, 
+const Input = ({
+  label,
+  error,
+
   icon: Icon,
-  className, 
+  className,
   containerClassName,
-  ...props 
+  ...props
 }) => {
   return (
     <div className={cn('space-y-1.5', containerClassName)}>
@@ -42,6 +44,6 @@ const Input = memo(({
       )}
     </div>
   );
-});
+};
 
 export default Input;

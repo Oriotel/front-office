@@ -5,7 +5,7 @@
    Midnight Slate: #111827
    ══════════════════════════════════════════════════ */
 
-*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after { box-sizing: border-box; }
 
 /* ── SPLIT ROOT ──────────────────────────────────── */
 .auth-split {
@@ -210,7 +210,7 @@
   align-items: center;
   background: #fff;
   border: 1.5px solid #d1d5db;
-  border-radius: 10px;
+  border-radius: 2px;
   transition: all .25s;
 }
 .auth-input-wrapper:focus-within {
@@ -255,7 +255,7 @@
   align-items: center;
   background: #fff;
   border: 1.5px solid #d1d5db;
-  border-radius: 10px;
+  border-radius: 2px;
   transition: all .25s;
 }
 .auth-select-wrapper:focus-within {
@@ -305,7 +305,7 @@
   font-family: inherit;
   font-weight: 700;
   border: none;
-  border-radius: 10px;
+  border-radius: 2px;
   cursor: pointer;
   transition: all .25s;
   letter-spacing: .2px;
@@ -453,7 +453,7 @@
   padding: .9rem .65rem;
   background: #fff;
   border: 1.5px solid #e5e7eb;
-  border-radius: 10px;
+  border-radius: 2px;
   color: #6b7280;
   cursor: pointer;
   transition: all .25s;
@@ -485,7 +485,7 @@
 .register-success-info {
   background: #eef1fd;
   border: 1px solid rgba(20,40,201,.25);
-  border-radius: 10px;
+  border-radius: 2px;
   padding: .9rem;
   margin-bottom: 1.5rem;
 }
@@ -512,7 +512,7 @@
   align-items: flex-start;
   background: #fefce8;
   border: 1px solid #fde047;
-  border-radius: 10px;
+  border-radius: 2px;
   padding: .9rem;
   margin-bottom: 1.5rem;
 }
@@ -574,7 +574,7 @@
   color: #111827;
   background: #fff;
   border: 1.5px solid #d1d5db;
-  border-radius: 10px;
+  border-radius: 2px;
   outline: none;
   transition: all .25s;
   caret-color: #1428C9;
@@ -603,7 +603,7 @@
   align-items: flex-start;
   gap: .6rem;
   padding: .8rem .9rem;
-  border-radius: 10px;
+  border-radius: 2px;
   margin-bottom: 1.1rem;
   animation: slideDown .3s ease;
 }

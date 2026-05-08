@@ -78,6 +78,11 @@ Since the   is currently under development, the authentication uses a mocked ser
 | :--- | :--- | :--- | :--- |
 | **Administrateur** | `admin@oriotel.com` | `Oriotel@2026` | Triggers **2FA** (Use code: `123456`) |
 | **Interne** (Animateur) | `animateur@oriotel.com` | `Oriotel@2026` | Triggers **Force Password Change** |
-| **Externe** (Agence) | `agence@oriotel.com` | `Oriotel@2026` | Standard Login (Direct to Dashboard) |
+| **Externe** (Agence) | `agence@oriotel.com` | `Oriotel@2026` | Standard Login (Direct to Dashboard) | 
 
 > **Note:** For any 2FA prompts during testing, use the mock code: `123456`.
+
+
+
+
+

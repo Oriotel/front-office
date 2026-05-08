@@ -168,13 +168,14 @@ const authSlice = createSlice({
           state.passwordChangeRequired = true;
           state.authStep = AUTH_STEPS.FORCE_PASSWORD_CHANGE;
           state.isAuthenticated = false;
+          // Save temp token for password change flow
           state.token = action.payload.token;
-          localStorage.setItem('auth_token', action.payload.token); // Save temp token
+          if (action.payload.token) localStorage.setItem('auth_token', action.payload.token);
         } else {
           state.isAuthenticated = true;
           state.authStep = AUTH_STEPS.AUTHENTICATED;
           state.token = action.payload.token;
-          localStorage.setItem('auth_token', action.payload.token);
+          if (action.payload.token) localStorage.setItem('auth_token', action.payload.token);
           localStorage.removeItem('2fa_user_id');
         }
       })
@@ -238,7 +239,8 @@ const authSlice = createSlice({
         state.token = action.payload.token;
         state.user = action.payload.user;
         
-        localStorage.setItem('auth_token', action.payload.token);
+        // Persist final token after 2FA
+        if (action.payload.token) localStorage.setItem('auth_token', action.payload.token);
         localStorage.removeItem('2fa_user_id');
 
         if (state.user?.mustChangePassword) {
@@ -277,12 +279,8 @@ const authSlice = createSlice({
     // ── Logout ──
     builder
       .addCase(logoutUser.fulfilled, () => {
-        return {
-          ...initialState,
-          token: null,
-          isAuthenticated: false,
-          authStep: AUTH_STEPS.LOGIN
-        };
+        localStorage.removeItem('auth_token');
+        return initialState;
       });
 
     // ── Fetch Current User ──

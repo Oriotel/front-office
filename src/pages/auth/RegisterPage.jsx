@@ -5,6 +5,7 @@ const RegisterPage = () => (
   <AuthLayout
     title="Demande d'accès"
     subtitle="Soumettez votre demande pour accéder à la plateforme Oriotel."
+    isWide={true}
   >
     <RegisterForm />
   </AuthLayout>

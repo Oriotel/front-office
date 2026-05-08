@@ -1,23 +1,18 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Mail, User, Phone, Building2, ChevronDown, FileText } from 'lucide-react';
+import { Mail, User, Phone, FileText, CreditCard, Lock, Briefcase } from 'lucide-react';
 import { registerSchema } from '@/validators/authValidators';
-import { USER_ROLES, INTERNAL_TYPES, EXTERNAL_TYPES } from '@/constants/authConstants';
 import Input from '@/components/common/Input';
 import Button from '@/components/common/Button';
 import Alert from '@/components/common/Alert';
 import useAuth from '@/hooks/useAuth';
-import { useState } from 'react';
-import { CheckCircle, ArrowLeft } from 'lucide-react';
 
 /**
- * Registration form — Submits access request to admin
- * Available for Interne (Animateur, Assistant) and Externe (Agence, Opérateur) users
+ * Registration form — access request (no role selection, no company name, no terms checkbox)
  */
 const RegisterForm = () => {
-  const [selectedRole, setSelectedRole] = useState(USER_ROLES.INTERNE);
-  const { register: registerUser, isLoading, error, clearError, registrationStatus, registrationMessage, resetRegistration } = useAuth();
-
+  const { register: registerUser, isLoading, error, clearError } = useAuth();
+  
   const {
     register,
     handleSubmit,
@@ -30,51 +25,21 @@ const RegisterForm = () => {
       firstName: '',
       lastName: '',
       email: '',
+      cin: '',
       phone: '',
-      role: USER_ROLES.INTERNE,
-      userType: '',
-      companyName: '',
+      role: '',
+      password: '',
+      passwordConfirmation: '',
       reason: '',
       acceptTerms: false,
     },
   });
 
-  const watchedRole = watch('role');
-  const subtypes = watchedRole === USER_ROLES.INTERNE
-    ? Object.values(INTERNAL_TYPES).map(t => ({ value: t, label: t.charAt(0).toUpperCase() + t.slice(1) }))
-    : Object.values(EXTERNAL_TYPES).map(t => ({ value: t, label: t.charAt(0).toUpperCase() + t.slice(1) }));
-
-  const handleRoleChange = (role) => {
-    setSelectedRole(role);
-    setValue('role', role);
-    setValue('userType', '');
-  };
+  const acceptTerms = watch('acceptTerms');
 
   const onSubmit = async (data) => {
     await registerUser(data);
   };
-
-  // Success state
-  if (registrationStatus === 'success') {
-    return (
-      <div className="register-success">
-        <div className="register-success-icon">
-          <CheckCircle size={64} />
-        </div>
-        <h2 className="register-success-title">Demande envoyée !</h2>
-        <p className="register-success-message">{registrationMessage}</p>
-        <div className="register-success-info">
-          <p>Vous recevrez une notification par email une fois votre demande traitée par l&apos;administrateur.</p>
-        </div>
-        <div className="register-success-actions">
-          <a href="/login" className="register-success-link">
-            <ArrowLeft size={18} />
-            <span>Retour à la connexion</span>
-          </a>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="register-form">
@@ -98,59 +63,8 @@ const RegisterForm = () => {
       />
 
       <form onSubmit={handleSubmit(onSubmit)} className="register-form-fields" noValidate>
-        {/* Role Selection */}
-        <div className="register-role-select">
-          <label className="auth-input-label">Type d&apos;utilisateur <span className="auth-input-required">*</span></label>
-          <div className="register-role-options">
-            <button
-              type="button"
-              className={`register-role-btn ${selectedRole === USER_ROLES.INTERNE ? 'register-role-btn--active' : ''}`}
-              onClick={() => handleRoleChange(USER_ROLES.INTERNE)}
-            >
-              <Building2 size={20} />
-              <span>Interne</span>
-              <small>Animateur, Assistant</small>
-            </button>
-            <button
-              type="button"
-              className={`register-role-btn ${selectedRole === USER_ROLES.EXTERNE ? 'register-role-btn--active' : ''}`}
-              onClick={() => handleRoleChange(USER_ROLES.EXTERNE)}
-            >
-              <User size={20} />
-              <span>Externe</span>
-              <small>Agence, Opérateur</small>
-            </button>
-          </div>
-        </div>
-
-        {/* User Type */}
-        <div className="auth-input-group">
-          <label htmlFor="register-userType" className="auth-input-label">
-            Fonction / Type
-            <span className="auth-input-required">*</span>
-          </label>
-          <div className={`auth-select-wrapper ${errors.userType ? 'auth-input-wrapper--error' : ''}`}>
-            <select
-              id="register-userType"
-              className="auth-select"
-              {...register('userType')}
-            >
-              <option value="">Sélectionnez votre fonction</option>
-              {subtypes.map((sub) => (
-                <option key={sub.value} value={sub.value}>
-                  {sub.label}
-                </option>
-              ))}
-            </select>
-            <ChevronDown size={18} className="auth-select-icon" />
-          </div>
-          {errors.userType && (
-            <p className="auth-input-error" role="alert">{errors.userType.message}</p>
-          )}
-        </div>
-
-        {/* Name Fields */}
-        <div className="register-row">
+        {/* User Info Grid (2 columns on desktop) */}
+        <div className="register-grid">
           <Input
             id="register-firstName"
             label="Prénom"
@@ -171,53 +85,98 @@ const RegisterForm = () => {
             autoComplete="family-name"
             {...register('lastName')}
           />
-        </div>
-
-        <Input
-          id="register-email"
-          label="Adresse email"
-          type="email"
-          icon={Mail}
-          placeholder="votre@email.com"
-          required
-          error={errors.email?.message}
-          autoComplete="email"
-          {...register('email')}
-        />
-
-        <Input
-          id="register-phone"
-          label="Numéro de téléphone"
-          type="tel"
-          icon={Phone}
-          placeholder="+212 6XX XXX XXX"
-          required
-          error={errors.phone?.message}
-          autoComplete="tel"
-          {...register('phone')}
-        />
-
-        {/* Company name (for Externe) */}
-        {selectedRole === USER_ROLES.EXTERNE && (
           <Input
-            id="register-companyName"
-            label="Nom de l'entreprise"
-            icon={Building2}
-            placeholder="Nom de votre entreprise"
-            error={errors.companyName?.message}
-            autoComplete="organization"
-            {...register('companyName')}
+            id="register-email"
+            label="Adresse email"
+            type="email"
+            icon={Mail}
+            placeholder="votre@email.com"
+            required
+            error={errors.email?.message}
+            autoComplete="email"
+            {...register('email')}
           />
-        )}
+          <Input
+            id="register-phone"
+            label="Numéro de téléphone"
+            type="tel"
+            icon={Phone}
+            placeholder="+212 6XX XXX XXX"
+            required
+            error={errors.phone?.message}
+            autoComplete="tel"
+            {...register('phone')}
+          />
+          <Input
+            id="register-cin"
+            label="Numéro de CIN"
+            icon={CreditCard}
+            placeholder="ex: AA123456"
+            required
+            error={errors.cin?.message}
+            {...register('cin')}
+          />
+
+          <div className="auth-input-group">
+            <label htmlFor="register-role" className="auth-input-label">
+              Rôle
+              <span className="auth-input-required">*</span>
+            </label>
+            <div className={`auth-input-wrapper ${errors.role ? 'auth-input-wrapper--error' : ''}`}>
+              <span className="auth-input-icon">
+                <Briefcase size={18} />
+              </span>
+              <select
+                id="register-role"
+                className="auth-input"
+                style={{ appearance: 'none', backgroundColor: 'transparent' }}
+                {...register('role')}
+              >
+                <option value="" disabled className="bg-gray-900 text-gray-400">Sélectionnez un rôle</option>
+                <option value="animateur" className="bg-gray-900">Animateur</option>
+                <option value="assistant" className="bg-gray-900">Assistant</option>
+                <option value="agence" className="bg-gray-900">Agence</option>
+                <option value="operateur" className="bg-gray-900">Opérateur</option>
+              </select>
+            </div>
+            {errors.role && (
+              <p className="auth-input-error" role="alert">{errors.role.message}</p>
+            )}
+          </div>
+          <Input
+            id="register-password"
+            label="Mot de passe"
+            type="password"
+            icon={Lock}
+            placeholder="Créer un mot de passe"
+            required
+            error={errors.password?.message}
+            autoComplete="new-password"
+            {...register('password')}
+          />
+          <Input
+            id="register-password-confirm"
+            label="Confirmer le mot de passe"
+            type="password"
+            icon={Lock}
+            placeholder="Répéter le mot de passe"
+            required
+            error={errors.passwordConfirmation?.message}
+            autoComplete="new-password"
+            {...register('passwordConfirmation')}
+          />
+        </div>
 
         {/* Reason / Justification */}
         <div className="auth-input-group">
           <label htmlFor="register-reason" className="auth-input-label">
             Motif de la demande
-            <span className="auth-input-required">*</span>
+            <span className="ml-1 text-xs text-gray-400 font-normal">(Optionnel)</span>
           </label>
           <div className={`auth-input-wrapper auth-textarea-wrapper ${errors.reason ? 'auth-input-wrapper--error' : ''}`}>
-            <FileText size={18} className="auth-textarea-icon" />
+            <span className="auth-textarea-icon">
+              <FileText size={18} />
+            </span>
             <textarea
               id="register-reason"
               className="auth-textarea"
@@ -257,6 +216,7 @@ const RegisterForm = () => {
           size="lg"
           fullWidth
           isLoading={isLoading}
+          disabled={!acceptTerms}
         >
           Soumettre la demande
         </Button>

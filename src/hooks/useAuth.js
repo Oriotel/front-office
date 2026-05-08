@@ -4,9 +4,11 @@ import { useCallback } from 'react';
 import {
   loginUser,
   registerUser,
+  verifyRegistrationCode,
   verify2FA,
   changePassword,
   logoutUser,
+  fetchCurrentUser,
   clearError,
   resetRegistration,
   selectAuth,
@@ -51,6 +53,14 @@ const useAuth = () => {
 
   const handleRegister = useCallback(async (data) => {
     const result = await dispatch(registerUser(data));
+    if (registerUser.fulfilled.match(result)) {
+      navigate('/register/verify');
+    }
+    return result;
+  }, [dispatch, navigate]);
+
+  const handleVerifyRegistrationCode = useCallback(async (data) => {
+    const result = await dispatch(verifyRegistrationCode(data));
     return result;
   }, [dispatch]);
 
@@ -79,6 +89,11 @@ const useAuth = () => {
     navigate('/login');
   }, [dispatch, navigate]);
 
+  const handleFetchCurrentUser = useCallback(async () => {
+    const result = await dispatch(fetchCurrentUser());
+    return result;
+  }, [dispatch]);
+
   const handleClearError = useCallback(() => {
     dispatch(clearError());
   }, [dispatch]);
@@ -103,9 +118,11 @@ const useAuth = () => {
     // Actions
     login: handleLogin,
     register: handleRegister,
+    verifyRegistrationCode: handleVerifyRegistrationCode,
     verify2FA: handleVerify2FA,
     changePassword: handleChangePassword,
     logout: handleLogout,
+    fetchCurrentUser: handleFetchCurrentUser,
     clearError: handleClearError,
     resetRegistration: handleResetRegistration,
   };

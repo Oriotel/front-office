@@ -33,12 +33,36 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+export const verifyRegistrationCode = createAsyncThunk(
+  'auth/verifyRegistration',
+  async (data, { rejectWithValue, getState }) => {
+    try {
+      const state = getState();
+      const user_id = state.auth.registrationUserId;
+      const response = await authService.verifyRegistration({ ...data, user_id });
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const verify2FA = createAsyncThunk(
   'auth/verify2FA',
-  async (data, { rejectWithValue }) => {
+  async (data, { rejectWithValue, getState }) => {
     try {
-      const response = await authService.verify2FA(data);
-      return response;
+      const state = getState();
+      const user_id = state.auth.user?.id || localStorage.getItem('2fa_user_id');
+      const response = await authService.verify2FA({ ...data, user_id });
+      
+      // Usually, we need the user profile after 2FA is verified, so let's fetch it if missing
+      let user = response.user;
+      if (!user) {
+        // We set the token in localStorage so authService can use it
+        localStorage.setItem('auth_token', response.token);
+        user = await authService.getCurrentUser();
+      }
+      return { ...response, user };
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -62,7 +86,21 @@ export const logoutUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       await authService.logout();
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('2fa_user_id');
       return null;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const fetchCurrentUser = createAsyncThunk(
+  'auth/fetchCurrentUser',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await authService.getCurrentUser();
+      return response;
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -73,16 +111,17 @@ export const logoutUser = createAsyncThunk(
 
 const initialState = {
   user: null,
-  token: null,
+  token: localStorage.getItem('auth_token') || null,
   refreshToken: null,
-  isAuthenticated: false,
+  isAuthenticated: !!localStorage.getItem('auth_token'),
   isLoading: false,
   error: null,
   registrationStatus: REGISTRATION_STATUS.IDLE,
   registrationMessage: null,
+  registrationUserId: localStorage.getItem('registration_user_id') || null,
   passwordChangeRequired: false,
   twoFactorPending: false,
-  authStep: AUTH_STEPS.LOGIN,
+  authStep: !!localStorage.getItem('auth_token') ? AUTH_STEPS.AUTHENTICATED : AUTH_STEPS.LOGIN,
 };
 
 // ─── Slice ───────────────────────────────────────────────
@@ -117,20 +156,26 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = null;
         state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.refreshToken = action.payload.refreshToken;
 
         if (action.payload.requiresTwoFactor) {
           state.twoFactorPending = true;
           state.authStep = AUTH_STEPS.TWO_FACTOR;
           state.isAuthenticated = false;
+          if (action.payload.user?.id) {
+            localStorage.setItem('2fa_user_id', action.payload.user.id);
+          }
         } else if (action.payload.requiresPasswordChange) {
           state.passwordChangeRequired = true;
           state.authStep = AUTH_STEPS.FORCE_PASSWORD_CHANGE;
           state.isAuthenticated = false;
+          state.token = action.payload.token;
+          localStorage.setItem('auth_token', action.payload.token); // Save temp token
         } else {
           state.isAuthenticated = true;
           state.authStep = AUTH_STEPS.AUTHENTICATED;
+          state.token = action.payload.token;
+          localStorage.setItem('auth_token', action.payload.token);
+          localStorage.removeItem('2fa_user_id');
         }
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -147,13 +192,38 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.registrationStatus = REGISTRATION_STATUS.SUCCESS;
+        // Proceed to verification step
+        state.registrationStatus = REGISTRATION_STATUS.VERIFICATION_REQUIRED;
         state.registrationMessage = action.payload.message;
+        // The backend should return the user id so we can verify the code
+        const userId = action.payload.user?.id || action.payload.user_id || action.payload.id;
+        state.registrationUserId = userId;
+        if (userId) {
+          localStorage.setItem('registration_user_id', userId);
+        }
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
         state.registrationStatus = REGISTRATION_STATUS.ERROR;
+      });
+
+    // ── Verify Registration ──
+    builder
+      .addCase(verifyRegistrationCode.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(verifyRegistrationCode.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.registrationStatus = REGISTRATION_STATUS.SUCCESS;
+        state.registrationMessage = action.payload.message || 'Votre demande a été soumise avec succès.';
+        state.registrationUserId = null;
+        localStorage.removeItem('registration_user_id');
+      })
+      .addCase(verifyRegistrationCode.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
       });
 
     // ── 2FA ──
@@ -166,6 +236,10 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.twoFactorPending = false;
         state.token = action.payload.token;
+        state.user = action.payload.user;
+        
+        localStorage.setItem('auth_token', action.payload.token);
+        localStorage.removeItem('2fa_user_id');
 
         if (state.user?.mustChangePassword) {
           state.passwordChangeRequired = true;
@@ -203,8 +277,26 @@ const authSlice = createSlice({
     // ── Logout ──
     builder
       .addCase(logoutUser.fulfilled, () => {
-        return initialState;
+        return {
+          ...initialState,
+          token: null,
+          isAuthenticated: false,
+          authStep: AUTH_STEPS.LOGIN
+        };
       });
+
+    // ── Fetch Current User ──
+    builder
+      .addCase(fetchCurrentUser.fulfilled, (state, action) => {
+        state.user = action.payload.user || action.payload.data || action.payload;
+      })
+      .addCase(fetchCurrentUser.rejected, (state) => {
+        // If fetch user fails, we might want to clear auth state
+        state.isAuthenticated = false;
+        state.token = null;
+        localStorage.removeItem('auth_token');
+      });
+
   },
 });
 
@@ -220,5 +312,6 @@ export const selectIsLoading = (state) => state.auth.isLoading;
 export const selectAuthError = (state) => state.auth.error;
 export const selectAuthStep = (state) => state.auth.authStep;
 export const selectRegistrationStatus = (state) => state.auth.registrationStatus;
+export const selectRegistrationUserId = (state) => state.auth.registrationUserId;
 
 export default authSlice.reducer;

@@ -65,13 +65,14 @@ The Identity Service manages user access with different tailored flows.
 3. **Utilisateur Externe** (Agence, Opérateur)
 
 ### Auth Flows
-- **Login:** Users log in using their email, password, and specific role/type.
+- **Login:** Users log in using only their email and password.
 - **2FA (Two-Factor Authentication):** Some users (like Admins) require an additional 6-digit code after a successful password check.
 - **Force Password Change:** New accounts created by the Admin are flagged to force a password change upon their first login to ensure security.
-- **Registration (Access Request):** Internal and External users cannot create active accounts directly. They submit a registration request that must be approved by the Admin.
+- **Registration (Access Request):** Users cannot create active accounts directly. They submit a simplified registration request (name, email, phone, reason) that must be approved by the Admin.
+- **Forgot Password:** Users can request a secure password reset link via their email.
 
 ## 🧪 Test Data (Mock Users)
-Since the backend is currently under development, the authentication uses a mocked service layer. Use the following credentials to test the different auth workflows:
+Since the   is currently under development, the authentication uses a mocked service layer. Use the following credentials to test the different auth workflows:
 
 | User Role | Email | Password | Workflow Triggered |
 | :--- | :--- | :--- | :--- |

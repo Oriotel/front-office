@@ -6,6 +6,8 @@ import AuthGuard from '@/guards/AuthGuard'
 // Lazy-loaded auth pages
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
 const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'))
+const RegisterVerifyPage = lazy(() => import('@/pages/auth/RegisterVerifyPage'))
+const ForgotPasswordPage = lazy(() => import('@/pages/auth/ForgotPasswordPage'))
 const ForcePasswordChangePage = lazy(() => import('@/pages/auth/ForcePasswordChangePage'))
 const TwoFactorPage = lazy(() => import('@/pages/auth/TwoFactorPage'))
 
@@ -50,6 +52,16 @@ function App() {
         <Route path="/register" element={
           <GuestGuard>
             <RegisterPage />
+          </GuestGuard>
+        } />
+        <Route path="/register/verify" element={
+          <GuestGuard>
+            <RegisterVerifyPage />
+          </GuestGuard>
+        } />
+        <Route path="/forgot-password" element={
+          <GuestGuard>
+            <ForgotPasswordPage />
           </GuestGuard>
         } />
 

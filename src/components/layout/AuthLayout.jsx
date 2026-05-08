@@ -1,5 +1,4 @@
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Shield, BarChart3, Users } from 'lucide-react';
+import { Shield, BarChart3, Users } from 'lucide-react';
 
 /**
  * AuthLayout — Split-screen design (Light Mode)
@@ -7,7 +6,7 @@ import { ArrowLeft, Shield, BarChart3, Users } from 'lucide-react';
  * Right: Cloud White form panel
  * Palette: Signal Blue #1428C9 | Cloud White #F9FAFB | Midnight Slate #111827
  */
-const AuthLayout = ({ children, title, subtitle }) => {
+const AuthLayout = ({ children, title, subtitle, isWide = false }) => {
   return (
     <div className="auth-split">
 
@@ -93,17 +92,9 @@ const AuthLayout = ({ children, title, subtitle }) => {
 
       {/* ── RIGHT PANEL (Cloud White light) ── */}
       <div className="auth-panel-right">
-        {/* Top nav */}
-        <div className="auth-panel-right__nav">
-          <Link to="https://site-vitrine-teal.vercel.app/" className="auth-panel-right__back" target="_blank" rel="noreferrer">
-            <ArrowLeft size={15} />
-            <span>Accueil</span>
-          </Link>
-        </div>
-
         {/* Scrollable content */}
         <div className="auth-panel-right__body">
-          <div className="auth-panel-right__content">
+          <div className={`auth-panel-right__content ${isWide ? 'auth-panel-right__content--wide' : ''}`}>
             {title && (
               <div className="auth-panel-right__header">
                 <h1 className="auth-panel-right__title">{title}</h1>

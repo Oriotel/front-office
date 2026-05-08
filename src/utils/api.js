@@ -7,7 +7,8 @@ import axios from 'axios';
  * error handling, and request/response transformation.
  */
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/identity/api/v1';
+const hostname = window.location.hostname;
+const BASE_URL = import.meta.env.VITE_API_URL || `http://${hostname}:8080/api/identity/api/v1`;
 
 /**
  * Get stored auth token

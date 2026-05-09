@@ -13,7 +13,8 @@ import {
   Settings,
   HelpCircle,
   ChevronRight,
-  Shield
+  Shield,
+  History
 } from "lucide-react";
 
 const DashboardLayout = () => {
@@ -32,6 +33,7 @@ const DashboardLayout = () => {
     { name: "Tableau de bord", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
     { name: "Utilisateurs", href: "/users", icon: <Users className="w-5 h-5" /> },
     { name: "Rôles", href: "/roles-permissions", icon: <Shield className="w-5 h-5" /> },
+    { name: "Historique", href: "/historique", icon: <History className="w-5 h-5" /> },
     { name: "Souscriptions", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> },
     { name: "Dossiers", href: "/dossiers", icon: <Folder className="w-5 h-5" /> },
     { name: "Stock", href: "/stock", icon: <Box className="w-5 h-5" /> },

@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { Suspense, lazy } from 'react'
 
 import RolesPermissionsPage from './pages/RolesPermissions/RolesPermissionsPage'
+import RechargeCalculator from './pages/RechargeCalculator'
 
 
 
@@ -60,6 +61,9 @@ function App() {
         {/* Auth flow routes (2FA & password change) */}
         <Route path="/auth/2fa" element={<TwoFactorPage />} />
         <Route path="/auth/change-password" element={<ForcePasswordChangePage />} />
+
+        {/* Public standalone tools */}
+        <Route path="/recharge-calculator" element={<RechargeCalculator />} />
 
         {/* Protected routes */}
         <Route path="/" element={

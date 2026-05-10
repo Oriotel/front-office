@@ -80,12 +80,16 @@ export const LOGIN_TABS = [
 
 // API endpoints (to be updated when backend is ready)
 export const AUTH_ENDPOINTS = {
-  LOGIN: '/api/auth/login',
-  REGISTER: '/api/auth/register',
-  LOGOUT: '/api/auth/logout',
-  REFRESH: '/api/auth/refresh',
-  VERIFY_2FA: '/api/auth/2fa/verify',
-  CHANGE_PASSWORD: '/api/auth/change-password',
-  FORGOT_PASSWORD: '/api/auth/forgot-password',
-  RESET_PASSWORD: '/api/auth/reset-password',
+  LOGIN: '/api/v1/auth/login',
+  REGISTER: '/api/v1/auth/register',
+  VERIFY_REGISTRATION: '/api/v1/auth/register/verify',
+  VERIFY_2FA: '/api/v1/auth/two-factor/verify',
+  RESEND_2FA: '/api/v1/auth/two-factor/resend',
+  FORCE_CHANGE_PASSWORD: '/api/v1/auth/force-change-password',
+  CHANGE_PASSWORD: '/api/v1/auth/change-password',
+  ME: '/api/v1/auth/me',
+  LOGOUT: '/api/v1/auth/logout',
+  REFRESH: '/api/v1/auth/refresh',
+  FORGOT_PASSWORD: '/api/v1/auth/forgot-password',
+  RESET_PASSWORD: '/api/v1/auth/reset-password',
 };

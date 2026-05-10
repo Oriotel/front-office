@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api/identity/api',
+  baseURL: 'http://localhost:8080/api/identity',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -18,6 +18,20 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add a response interceptor to unwrap data and handle errors
+api.interceptors.response.use(
+  (response) => {
+    return response.data;
+  },
+  (error) => {
+    // If the error has a response from the server, reject with that data
+    if (error.response && error.response.data) {
+      return Promise.reject(error.response.data);
+    }
     return Promise.reject(error);
   }
 );

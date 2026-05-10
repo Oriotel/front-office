@@ -1,5 +1,5 @@
 import { AUTH_ENDPOINTS } from '../constants/authConstants';
-import api from '../utils/api';
+import api from './api';
 
 /**
  * Authentication Service Layer

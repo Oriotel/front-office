@@ -13,6 +13,8 @@ import AuthGuard from '@/guards/AuthGuard'
 import DashboardLayout from './components/layout/DashboardLayout'
 import UsersPage from './pages/UsersPage'
 import UserHistoryPage from './pages/UserHistoryPage'
+import SubscriptionsPage from './pages/SubscriptionsPage'
+import AssistantSubscriptionsPage from './pages/AssistantSubscriptionsPage'
 
 // Lazy-loaded auth pages
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
@@ -74,6 +76,8 @@ function App() {
           <Route index element={<Navigate to="/users" replace />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="historique" element={<UserHistoryPage />} />
+          <Route path="subscriptions" element={<SubscriptionsPage />} />
+          <Route path="assistant/subscriptions" element={<AssistantSubscriptionsPage />} />
           <Route path="settings" element={<div className="p-8"><h1 className="text-2xl font-bold">Paramètres</h1></div>} />
 
           <Route path="/" element={<RolesPermissionsPage />} />

@@ -31,9 +31,9 @@ const RolesPermissionsPage = () => {
 
   const fetchRoles = async () => {
     try {
-      const response = await api.get('/v1/roles-permissions/roles');
-      if (response.data.success) {
-        const mappedRoles = response.data.roles.map(r => ({
+      const response = await api.get('api/v1/roles-permissions/roles');
+      if (response.success) {
+        const mappedRoles = response.roles.map(r => ({
           ...r,
           users: r.users_count || 0
         }));
@@ -57,11 +57,11 @@ const RolesPermissionsPage = () => {
 
   const fetchRoleUsers = async () => {
     try {
-      const response = await api.get(`/v1/roles-permissions/roles/${selectedRole}/users`, {
+      const response = await api.get(`api/v1/roles-permissions/roles/${selectedRole}/users`, {
         params: { search: searchQuery }
       });
-      if (response.data.success) {
-        setRoleUsersData(response.data.users);
+      if (response.success) {
+        setRoleUsersData(response.users);
       }
     } catch (error) {
       console.error("Error fetching role users:", error);
@@ -77,14 +77,14 @@ const RolesPermissionsPage = () => {
 
   const fetchPermissions = async () => {
     try {
-      const response = await api.get('/v1/roles-permissions/permissions', {
+      const response = await api.get('api/v1/roles-permissions/permissions', {
         params: {
           role_id: selectedRole,
           user_ids: selectedUsers.map(u => u.id)
         }
       });
-      if (response.data.success) {
-        setPermissions(response.data.permissions);
+      if (response.success) {
+        setPermissions(response.permissions);
       }
     } catch (error) {
       console.error("Error fetching permissions:", error);
@@ -129,15 +129,15 @@ const RolesPermissionsPage = () => {
   const handleAddRole = async () => {
     if (newRoleName.trim() === '') return;
     try {
-      const response = await api.post('/v1/roles-permissions/roles', {
+      const response = await api.post('api/v1/roles-permissions/roles', {
         name: newRoleName,
         color: 'bg-gray-700'
       });
-      if (response.data.success) {
+      if (response.success) {
         setIsModalOpen(false);
         setNewRoleName('');
         await fetchRoles(); // Refresh roles list
-        setSelectedRole(response.data.role.id);
+        setSelectedRole(response.role.id);
       }
     } catch (error) {
       console.error("Error creating role:", error);
@@ -150,12 +150,12 @@ const RolesPermissionsPage = () => {
   const handleSavePermissions = async () => {
     setLoading(true);
     try {
-      const response = await api.post('/v1/roles-permissions/permissions/sync', {
+      const response = await api.post('api/v1/roles-permissions/permissions/sync', {
         role_id: selectedRole,
         user_ids: selectedUsers.map(u => u.id),
         permissions: permissions
       });
-      if (response.data.success) {
+      if (response.success) {
         setStep(1); // Return to step 1 as requested
         setSelectedUsers([]);
       }

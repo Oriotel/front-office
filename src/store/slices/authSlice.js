@@ -280,7 +280,22 @@ const authSlice = createSlice({
     builder
       .addCase(logoutUser.fulfilled, () => {
         localStorage.removeItem('auth_token');
-        return initialState;
+        localStorage.removeItem('2fa_user_id');
+        localStorage.removeItem('registration_user_id');
+        return {
+          user: null,
+          token: null,
+          refreshToken: null,
+          isAuthenticated: false,
+          isLoading: false,
+          error: null,
+          registrationStatus: REGISTRATION_STATUS.IDLE,
+          registrationMessage: null,
+          registrationUserId: null,
+          passwordChangeRequired: false,
+          twoFactorPending: false,
+          authStep: AUTH_STEPS.LOGIN,
+        };
       });
 
     // ── Fetch Current User ──

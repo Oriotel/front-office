@@ -4,15 +4,18 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Avatar from "@radix-ui/react-avatar";
 import Button from '../common/Button';
 import Input from '../common/Input';
+import useAuth from '@/hooks/useAuth';
 
 const Header = ({ onMenuClick }) => {
+  const { logout } = useAuth();
   const location = useLocation();
   const pathnames = location.pathname.split('/').filter((x) => x);
 
   const breadcrumbMap = {
     'users': 'Utilisateurs',
     'settings': 'Paramètres',
-    'dashboard': 'Tableau de bord'
+    'dashboard': 'Tableau de bord',
+    'stock': 'Gestion du stock'
   };
 
   return (
@@ -29,7 +32,7 @@ const Header = ({ onMenuClick }) => {
           />
           
           <nav className="flex items-center gap-3 text-sm font-medium overflow-x-auto whitespace-nowrap no-scrollbar py-1">
-            <Link to="/" className="text-gray-500 hover:text-[#1428C9] transition-all duration-200 shrink-0 font-semibold">Accueil</Link>
+            <Link to="/dashboard" className="text-gray-500 hover:text-[#1428C9] transition-all duration-200 shrink-0 font-semibold">Accueil</Link>
             {pathnames.map((value, index) => {
               const last = index === pathnames.length - 1;
               const to = `/${pathnames.slice(0, index + 1).join('/')}`;
@@ -109,7 +112,7 @@ const Header = ({ onMenuClick }) => {
                         </Link>
                       </DropdownMenu.Item>
                       <DropdownMenu.Item className="outline-none">
-                        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-semibold text-red-600 hover:bg-red-50 transition-all duration-200">
+                        <button onClick={logout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-semibold text-red-600 hover:bg-red-50 transition-all duration-200">
                           <LogOut size={18} />
                           <span>Déconnexion</span>
                         </button>

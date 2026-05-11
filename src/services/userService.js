@@ -22,23 +22,26 @@ const mapUserToApi = (userData) => {
 };
 
 /**
- * Service for managing users.
- * Calls identity-nginx on port 8082 (baseURL: http://localhost:8082/api)
- * Full URL: http://localhost:8082/api/v1/users
+ * Service for managing users via the API Gateway.
+ * baseURL = http://localhost:8080/api/identity
+ * Nginx strips /api/identity/ → Laravel receives /v1/users
+ * So all paths here must start with 'v1/...'
  */
 export const userService = {
   getUsers: async (params = {}) => {
-    const response = await api.get('v1/users', { params });
-    // UserResource collection returns { data: [...] }
+    // api.js interceptor unwraps response.data → we receive { data: [...] }
+    // So response.data is the actual array of users
+    const response = await api.get('api/v1/users', { params });
+    const list = Array.isArray(response.data) ? response.data : (response.data?.data ?? []);
     return {
-      data: response.data.data.map(mapUserFromApi),
-      total: response.data.meta?.total || response.data.data.length
+      data: list.map(mapUserFromApi),
+      total: response.meta?.total ?? response.data?.meta?.total ?? list.length,
     };
   },
 
   getUser: async (id) => {
-    const response = await api.get(`v1/users/${id}`);
-    return mapUserFromApi(response.data.data);
+    const response = await api.get(`api/v1/users/${id}`);
+    return mapUserFromApi(response.data ?? response);
   },
 
   createUser: async (userData) => {
@@ -47,8 +50,8 @@ export const userService = {
       ? { headers: { 'Content-Type': 'multipart/form-data' } }
       : {};
       
-    const response = await api.post('v1/users', mappedData, config);
-    return mapUserFromApi(response.data.data);
+    const response = await api.post('api/v1/users', mappedData, config);
+    return mapUserFromApi(response.data ?? response);
   },
 
   updateUser: async (id, userData) => {
@@ -59,16 +62,16 @@ export const userService = {
       
     if (mappedData instanceof FormData) {
       mappedData.append('_method', 'PUT');
-      const response = await api.post(`v1/users/${id}`, mappedData, config);
-      return mapUserFromApi(response.data.data);
+      const response = await api.post(`api/v1/users/${id}`, mappedData, config);
+      return mapUserFromApi(response.data ?? response);
     }
 
-    const response = await api.put(`v1/users/${id}`, mappedData);
-    return mapUserFromApi(response.data.data);
+    const response = await api.put(`api/v1/users/${id}`, mappedData);
+    return mapUserFromApi(response.data ?? response);
   },
 
   deleteUser: async (id) => {
-    const response = await api.delete(`v1/users/${id}`);
-    return response.data;
+    const response = await api.delete(`api/v1/users/${id}`);
+    return response;
   }
 };

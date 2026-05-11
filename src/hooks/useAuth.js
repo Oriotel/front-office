@@ -5,6 +5,7 @@ import {
   loginUser,
   registerUser,
   verifyRegistrationCode,
+  resendRegistrationCode,
   verify2FA,
   changePassword,
   logoutUser,
@@ -35,6 +36,7 @@ const useAuth = () => {
   const error = useSelector(selectAuthError);
   const authStep = useSelector(selectAuthStep);
   const registrationStatus = useSelector(selectRegistrationStatus);
+  const registrationEmail = useSelector((state) => state.auth.registrationEmail);
 
   const handleLogin = useCallback(async (credentials) => {
     const result = await dispatch(loginUser(credentials));
@@ -44,6 +46,8 @@ const useAuth = () => {
         navigate('/auth/2fa');
       } else if (requiresPasswordChange) {
         navigate('/auth/change-password');
+      } else if (result.payload.redirect) {
+        navigate(result.payload.redirect);
       } else {
         navigate('/dashboard');
       }
@@ -63,6 +67,13 @@ const useAuth = () => {
     const result = await dispatch(verifyRegistrationCode(data));
     return result;
   }, [dispatch]);
+
+  const handleResendRegistrationCode = useCallback(async () => {
+    const email = registrationEmail || localStorage.getItem('registration_email');
+    if (email) {
+      return await dispatch(resendRegistrationCode(email));
+    }
+  }, [dispatch, registrationEmail]);
 
   const handleVerify2FA = useCallback(async (data) => {
     const result = await dispatch(verify2FA(data));
@@ -119,12 +130,14 @@ const useAuth = () => {
     login: handleLogin,
     register: handleRegister,
     verifyRegistrationCode: handleVerifyRegistrationCode,
+    resendRegistrationCode: handleResendRegistrationCode,
     verify2FA: handleVerify2FA,
     changePassword: handleChangePassword,
     logout: handleLogout,
     fetchCurrentUser: handleFetchCurrentUser,
     clearError: handleClearError,
     resetRegistration: handleResetRegistration,
+    registrationEmail,
   };
 };
 

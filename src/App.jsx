@@ -5,14 +5,13 @@ import { Suspense, lazy } from 'react'
 import RolesPermissionsPage from './pages/RolesPermissions/RolesPermissionsPage'
 import RechargeCalculator from './pages/RechargeCalculator'
 
-
-
 import GuestGuard from '@/guards/GuestGuard'
 import AuthGuard from '@/guards/AuthGuard'
 
 import DashboardLayout from './components/layout/DashboardLayout'
 import UsersPage from './pages/UsersPage'
 import UserHistoryPage from './pages/UserHistoryPage'
+import SubscriptionsPage from './pages/SubscriptionsPage'
 import StockManagement from './pages/Stock/StockManagement'
 import WorkTimeManagement from './pages/WorkTime/WorkTimeManagement'
 
@@ -80,6 +79,7 @@ function App() {
           <Route index element={<Navigate to="/dashboard/users" replace />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="historique" element={<UserHistoryPage />} />
+          <Route path="subscriptions" element={<SubscriptionsPage />} />
           <Route path="settings" element={<div className="p-8"><h1 className="text-2xl font-bold">Paramètres</h1></div>} />
           <Route path="roles-permissions" element={<RolesPermissionsPage />} />
           <Route path="stock" element={<StockManagement />} />
@@ -96,4 +96,3 @@ function App() {
 }
 
 export default App
-

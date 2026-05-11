@@ -34,9 +34,10 @@ const RolesPermissionsPage = () => {
 
   const fetchRoles = async () => {
     try {
-      const response = await api.get('/v1/roles-permissions/roles');
-      if (response.data.success) {
-        const apiRoles = response.data.roles.map(r => ({
+
+      const response = await api.get('api/v1/roles-permissions/roles');
+      if (response.success) {
+        const apiRoles = response.roles.map(r => ({
           ...r,
           users: r.users_count || 0
         }));
@@ -52,12 +53,12 @@ const RolesPermissionsPage = () => {
 
         // Filter out static roles that already exist in API roles (by name)
         const filteredStatic = staticRoles.filter(
-          sr => !apiRoles.some(ar => ar.name.toLowerCase() === sr.name.toLowerCase())
+          sr => !apiRoles.some(ar => (ar.name || '').toLowerCase() === (sr.name || '').toLowerCase())
         );
 
         const combinedRoles = [...apiRoles, ...filteredStatic];
         setRoles(combinedRoles);
-        
+
         // Default to first role if none selected
         if (!selectedRole && combinedRoles.length > 0) {
           setSelectedRole(combinedRoles[0].id);
@@ -78,11 +79,11 @@ const RolesPermissionsPage = () => {
 
   const fetchRoleUsers = async () => {
     try {
-      const response = await api.get(`/v1/roles-permissions/roles/${selectedRole}/users`, {
+      const response = await api.get(`api/v1/roles-permissions/roles/${selectedRole}/users`, {
         params: { search: searchQuery }
       });
-      if (response.data.success) {
-        setRoleUsersData(response.data.users);
+      if (response.success) {
+        setRoleUsersData(response.users);
       }
     } catch (error) {
       console.error("Error fetching role users:", error);
@@ -98,14 +99,14 @@ const RolesPermissionsPage = () => {
 
   const fetchPermissions = async () => {
     try {
-      const response = await api.get('/v1/roles-permissions/permissions', {
+      const response = await api.get('api/v1/roles-permissions/permissions', {
         params: {
           role_id: selectedRole,
           user_ids: selectedUsers.map(u => u.id)
         }
       });
-      if (response.data.success) {
-        setPermissions(response.data.permissions);
+      if (response.success) {
+        setPermissions(response.permissions);
       }
     } catch (error) {
       console.error("Error fetching permissions:", error);
@@ -180,15 +181,15 @@ const RolesPermissionsPage = () => {
   const handleAddRole = async () => {
     if (newRoleName.trim() === '') return;
     try {
-      const response = await api.post('/v1/roles-permissions/roles', {
+      const response = await api.post('api/v1/roles-permissions/roles', {
         name: newRoleName,
         color: 'bg-gray-700'
       });
-      if (response.data.success) {
+      if (response.success) {
         setIsModalOpen(false);
         setNewRoleName('');
         await fetchRoles(); // Refresh roles list
-        setSelectedRole(response.data.role.id);
+        setSelectedRole(response.role.id);
       }
     } catch (error) {
       console.error("Error creating role:", error);
@@ -199,10 +200,10 @@ const RolesPermissionsPage = () => {
   const handleUpdateRole = async () => {
     if (!editingRole || newRoleName.trim() === '') return;
     try {
-      const response = await api.put(`/v1/roles-permissions/roles/${editingRole.id}`, {
+      const response = await api.put(`api/v1/roles-permissions/roles/${editingRole.id}`, {
         name: newRoleName,
       });
-      if (response.data.success) {
+      if (response.success) {
         setEditingRole(null);
         setNewRoleName('');
         await fetchRoles();
@@ -216,8 +217,8 @@ const RolesPermissionsPage = () => {
   const handleDeleteRole = async (roleId) => {
     if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce rôle ?")) return;
     try {
-      const response = await api.delete(`/v1/roles-permissions/roles/${roleId}`);
-      if (response.data.success) {
+      const response = await api.delete(`api/v1/roles-permissions/roles/${roleId}`);
+      if (response.success) {
         if (selectedRole === roleId) setSelectedRole(null);
         await fetchRoles();
       }
@@ -233,11 +234,11 @@ const RolesPermissionsPage = () => {
       const role = roles.find(r => r.id === roleId);
       if (!role) return;
 
-      const response = await api.put(`/v1/users/${userId}`, {
+      const response = await api.put(`api/v1/users/${userId}`, {
         role: role.name.toLowerCase()
       });
-      
-      if (response.data) {
+
+      if (response) {
         // Refresh the list
         await fetchRoleUsers();
       }
@@ -251,12 +252,12 @@ const RolesPermissionsPage = () => {
   const handleSavePermissions = async () => {
     setLoading(true);
     try {
-      const response = await api.post('/v1/roles-permissions/permissions/sync', {
+      const response = await api.post('api/v1/roles-permissions/permissions/sync', {
         role_id: selectedRole,
         user_ids: selectedUsers.map(u => u.id),
         permissions: permissions
       });
-      if (response.data.success) {
+      if (response.success) {
         setStep(1); // Return to step 1 as requested
         setSelectedUsers([]);
       }
@@ -323,7 +324,7 @@ const RolesPermissionsPage = () => {
                   </button>
                 </div>
               </div>
-              
+
               <RoleList
                 roles={displayRoles}
                 selectedRoles={selectedRole ? [selectedRole] : []}
@@ -345,7 +346,7 @@ const RolesPermissionsPage = () => {
                 onDeleteRole={handleDeleteRole}
               />
 
-              
+
               <div className="mt-8 pt-4 border-t border-gray-50">
                 <p className="text-xs text-gray-400">
                   {!selectedRole
@@ -421,7 +422,7 @@ const RolesPermissionsPage = () => {
                   <button onClick={() => setStep(2)} className="px-6 py-3 bg-gray-100 text-gray-600 text-sm font-bold uppercase tracking-wider hover:bg-gray-200 transition-colors">
                     ← Retour
                   </button>
-                  <button 
+                  <button
                     onClick={handleSavePermissions}
                     disabled={loading}
                     className="px-10 py-3 bg-primary text-white text-sm font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors flex items-center gap-3 disabled:opacity-50"
@@ -450,9 +451,9 @@ const RolesPermissionsPage = () => {
 
               <div className="space-y-4">
                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Matrice des modules</h3>
-                <PermissionMatrix 
-                  permissions={permissions} 
-                  onToggle={handleTogglePermission} 
+                <PermissionMatrix
+                  permissions={permissions}
+                  onToggle={handleTogglePermission}
                   onToggleModule={handleToggleModule}
                   onToggleAction={handleToggleAction}
                 />
@@ -471,11 +472,11 @@ const RolesPermissionsPage = () => {
               <h3 className="font-bold text-lg text-text-dark">
                 {editingRole ? 'Modifier le rôle' : 'Ajouter un nouveau rôle'}
               </h3>
-              <button 
+              <button
                 onClick={() => {
                   setIsModalOpen(false);
                   setEditingRole(null);
-                }} 
+                }}
                 className="text-gray-400 hover:text-red-500"
               >
                 <X size={20} />
@@ -494,18 +495,18 @@ const RolesPermissionsPage = () => {
               />
             </div>
             <div className="p-5 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50">
-              <button 
+              <button
                 onClick={() => {
                   setIsModalOpen(false);
                   setEditingRole(null);
-                }} 
+                }}
                 className="px-5 py-2.5 bg-white border border-gray-300 text-gray-600 font-bold text-sm uppercase hover:bg-gray-50"
               >
                 Annuler
               </button>
-              <button 
-                onClick={editingRole ? handleUpdateRole : handleAddRole} 
-                disabled={!newRoleName.trim()} 
+              <button
+                onClick={editingRole ? handleUpdateRole : handleAddRole}
+                disabled={!newRoleName.trim()}
                 className="px-5 py-2.5 bg-primary text-white font-bold text-sm uppercase hover:bg-primary/90 disabled:opacity-50"
               >
                 {editingRole ? 'Enregistrer' : 'Créer'}

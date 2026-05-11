@@ -128,15 +128,15 @@ const RegisterForm = () => {
               </span>
               <select
                 id="register-role"
-                className="auth-input"
-                style={{ appearance: 'none', backgroundColor: 'transparent' }}
+                className="auth-input text-white"
+                style={{ appearance: 'none' }}
                 {...register('role')}
               >
-                <option value="" disabled className="bg-gray-900 text-gray-400">Sélectionnez un rôle</option>
-                <option value="animateur" className="bg-gray-900">Animateur</option>
-                <option value="assistant" className="bg-gray-900">Assistant</option>
-                <option value="agence" className="bg-gray-900">Agence</option>
-                <option value="operateur" className="bg-gray-900">Opérateur</option>
+                <option value="" disabled className="bg-[#1a1c23] text-gray-400">Sélectionnez un rôle</option>
+                <option value="animateur" className="bg-[#1a1c23] text-white">Animateur</option>
+                <option value="assistant" className="bg-[#1a1c23] text-white">Assistant</option>
+                <option value="agence" className="bg-[#1a1c23] text-white">Agence</option>
+                <option value="operateur" className="bg-[#1a1c23] text-white">Opérateur</option>
               </select>
             </div>
             {errors.role && (

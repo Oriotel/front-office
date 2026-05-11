@@ -5,8 +5,6 @@ import { Suspense, lazy } from 'react'
 import RolesPermissionsPage from './pages/RolesPermissions/RolesPermissionsPage'
 import RechargeCalculator from './pages/RechargeCalculator'
 
-
-
 import GuestGuard from '@/guards/GuestGuard'
 import AuthGuard from '@/guards/AuthGuard'
 
@@ -15,6 +13,7 @@ import UsersPage from './pages/UsersPage'
 import UserHistoryPage from './pages/UserHistoryPage'
 import SubscriptionsPage from './pages/SubscriptionsPage'
 import AssistantSubscriptionsPage from './pages/AssistantSubscriptionsPage'
+import StockManagement from './pages/Stock/StockManagement'
 
 // Lazy-loaded auth pages
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
@@ -67,26 +66,24 @@ function App() {
         {/* Public standalone tools */}
         <Route path="/recharge-calculator" element={<RechargeCalculator />} />
 
+        {/* Root redirects to login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+
         {/* Protected routes */}
-        <Route path="/" element={
+        <Route path="/dashboard" element={
           <AuthGuard>
             <DashboardLayout />
           </AuthGuard>
         }>
-          <Route index element={<Navigate to="/users" replace />} />
+          <Route index element={<Navigate to="/dashboard/users" replace />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="historique" element={<UserHistoryPage />} />
           <Route path="subscriptions" element={<SubscriptionsPage />} />
           <Route path="assistant/subscriptions" element={<AssistantSubscriptionsPage />} />
           <Route path="settings" element={<div className="p-8"><h1 className="text-2xl font-bold">Paramètres</h1></div>} />
-
-          <Route path="/" element={<RolesPermissionsPage />} />
-          <Route path="/roles-permissions" element={<RolesPermissionsPage />} />
-          <Route path="*" element={<RolesPermissionsPage />} />
-
+          <Route path="roles-permissions" element={<RolesPermissionsPage />} />
+          <Route path="stock" element={<StockManagement />} />
         </Route>
-
-        <Route path="/dashboard" element={<Navigate to="/users" replace />} />
 
         {/* Default redirect */}
         <Route path="*" element={<Navigate to="/login" replace />} />
@@ -97,4 +94,3 @@ function App() {
 }
 
 export default App
-

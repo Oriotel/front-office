@@ -22,10 +22,10 @@ export const EXTERNAL_TYPES = {
   OPERATEUR: 'operateur',
 };
 
+// Registration request status
 export const REGISTRATION_STATUS = {
   IDLE: 'idle',
   PENDING: 'pending',
-  VERIFICATION_REQUIRED: 'verification_required',
   SUCCESS: 'success',
   ERROR: 'error',
 };
@@ -78,17 +78,18 @@ export const LOGIN_TABS = [
   },
 ];
 
-// API endpoints (matching backend Identity Service v1)
+// API endpoints (to be updated when backend is ready)
 export const AUTH_ENDPOINTS = {
-  LOGIN: '/auth/login',
-  REGISTER: '/auth/register',
-  VERIFY_REGISTRATION: '/auth/register/verify',
-  LOGOUT: '/auth/logout',
-  VERIFY_2FA: '/auth/two-factor/verify',
-  RESEND_2FA: '/auth/two-factor/resend',
-  CHANGE_PASSWORD: '/auth/change-password',
-  FORCE_CHANGE_PASSWORD: '/auth/force-change-password',
-  FORGOT_PASSWORD: '/auth/forgot-password',
-  RESET_PASSWORD: '/auth/reset-password',
-  ME: '/auth/me',
+  LOGIN: '/api/v1/auth/login',
+  REGISTER: '/api/v1/auth/register',
+  VERIFY_REGISTRATION: '/api/v1/auth/register/verify',
+  VERIFY_2FA: '/api/v1/auth/two-factor/verify',
+  RESEND_2FA: '/api/v1/auth/two-factor/resend',
+  FORCE_CHANGE_PASSWORD: '/api/v1/auth/force-change-password',
+  CHANGE_PASSWORD: '/api/v1/auth/change-password',
+  ME: '/api/v1/auth/me',
+  LOGOUT: '/api/v1/auth/logout',
+  REFRESH: '/api/v1/auth/refresh',
+  FORGOT_PASSWORD: '/api/v1/auth/forgot-password',
+  RESET_PASSWORD: '/api/v1/auth/reset-password',
 };

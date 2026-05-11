@@ -98,33 +98,74 @@ const AssistantSubscriptionsPage = () => {
   return (
     <div className="subscriptions-container animate-in fade-in duration-500">
       <div className="page-header">
-        <h1 className="page-title">Subscriptions Management</h1>
-        <p className="page-subtitle">Manage and validate subscription requests</p>
+        <h1 className="page-title text-3xl">Subscriptions Management</h1>
+        <p className="page-subtitle text-slate-500 font-medium">Manage and validate subscription requests</p>
       </div>
 
-      <SubscriptionStats />
+      {/* Custom Stats Grid to match Screenshot 1 */}
+      <div className="grid grid-cols-4 gap-6 mb-10">
+        <div className="stat-card group">
+          <div className="stat-header">
+            <span className="stat-label">TOTAL SENT</span>
+            <div className="stat-icon-wrapper bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+            </div>
+          </div>
+          <span className="stat-value">5</span>
+          <span className="stat-footer">All registered system entries</span>
+        </div>
+        
+        <div className="stat-card group">
+          <div className="stat-header">
+            <span className="stat-label">PENDING</span>
+            <div className="stat-icon-wrapper bg-orange-50 text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-all">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+          </div>
+          <span className="stat-value">2</span>
+          <span className="stat-footer">Awaiting validation review</span>
+        </div>
 
-      <div className="content-card mt-8">
-        <div className="content-tabs">
+        <div className="stat-card group">
+          <div className="stat-header">
+            <span className="stat-label">VALIDATED</span>
+            <div className="stat-icon-wrapper bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-all">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+          </div>
+          <span className="stat-value">1</span>
+          <span className="stat-footer">Confirmed and active</span>
+        </div>
+
+        <div className="stat-card group">
+          <div className="stat-header">
+            <span className="stat-label">REFUSED</span>
+            <div className="stat-icon-wrapper bg-red-50 text-red-600 group-hover:bg-red-600 group-hover:text-white transition-all">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            </div>
+          </div>
+          <span className="stat-value">1</span>
+          <span className="stat-footer">Declined applications</span>
+        </div>
+      </div>
+
+      <div className="content-card border-none shadow-xl shadow-slate-100">
+        <div className="content-tabs px-8">
           <div className="tab-item active">Total Subscription</div>
-          <div className="tab-item">Validated Subscription</div>
-          <div className="tab-item">Pending Subscription</div>
-          <div className="tab-item">Refused</div>
         </div>
         
         <SubscriptionFilters 
-          onAddClick={null} // Assistants don't add, they manage
+          onAddClick={null} 
           onSearch={setSearchQuery}
           onExport={handleExport}
           onFilterToggle={() => setIsFilterVisible(!isFilterVisible)}
         />
 
         {isFilterVisible && (
-          <div className="filter-panel">
-            {/* Same filter controls as before */}
+          <div className="filter-panel px-8 py-6 bg-slate-50/50">
             <div className="filter-group">
               <span className="filter-label">Operator</span>
-              <select className="filter-select" value={filters.operator} onChange={e => setFilters(f => ({...f, operator: e.target.value}))}>
+              <select className="filter-select font-bold" value={filters.operator} onChange={e => setFilters(f => ({...f, operator: e.target.value}))}>
                 <option value="All">All Operators</option>
                 <option value="IAM">IAM</option>
                 <option value="Orange">Orange</option>
@@ -133,7 +174,7 @@ const AssistantSubscriptionsPage = () => {
             </div>
             <div className="filter-group">
               <span className="filter-label">Status</span>
-              <select className="filter-select" value={filters.status} onChange={e => setFilters(f => ({...f, status: e.target.value}))}>
+              <select className="filter-select font-bold" value={filters.status} onChange={e => setFilters(f => ({...f, status: e.target.value}))}>
                 <option value="All">All Status</option>
                 <option value="PENDING">Pending</option>
                 <option value="VALIDATED">Validated</option>
@@ -142,31 +183,45 @@ const AssistantSubscriptionsPage = () => {
             </div>
             <div className="filter-group">
               <span className="filter-label">De</span>
-              <input type="date" className="filter-input-date" value={filters.startDate} onChange={e => setFilters(f => ({...f, startDate: e.target.value}))} />
+              <input type="date" className="filter-input-date font-bold" value={filters.startDate} onChange={e => setFilters(f => ({...f, startDate: e.target.value}))} />
             </div>
             <div className="filter-group">
               <span className="filter-label">À</span>
-              <input type="date" className="filter-input-date" value={filters.endDate} onChange={e => setFilters(f => ({...f, endDate: e.target.value}))} />
+              <input type="date" className="filter-input-date font-bold" value={filters.endDate} onChange={e => setFilters(f => ({...f, endDate: e.target.value}))} />
             </div>
-            <button className="btn-reset-filters" onClick={() => { setFilters({operator:'All', status:'All', startDate:'', endDate:''}); setSearchQuery(''); }}>
-              <RotateCcw size={14} /> <span>Réinitialiser</span>
+            <button className="btn-reset-filters bg-white border border-slate-200 shadow-sm" onClick={() => { setFilters({operator:'All', status:'All', startDate:'', endDate:''}); setSearchQuery(''); }}>
+              <RotateCcw size={14} /> <span className="font-black">Réinitialiser</span>
             </button>
           </div>
         )}
         
-        <SubscriptionTable 
-          data={filteredData} 
-          onView={(item) => { setSelectedItem(item); setIsDetailsOpen(true); }}
-          onEdit={handleValidateClick} // Assistant "Edit" is actually Validate/Refuse flow
-          onDelete={handleRefuseClick}
-        />
+        <div className="px-4">
+          <SubscriptionTable 
+            data={filteredData} 
+            onView={(item) => { setSelectedItem(item); setIsDetailsOpen(true); }}
+            onEdit={handleValidateClick} 
+            onDelete={handleRefuseClick}
+            isAssistant={true}
+          />
+        </div>
+
+        <div className="p-6 border-t border-slate-50 flex justify-between items-center">
+            <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Showing 1 to {filteredData.length} of {data.length} entries</span>
+            <div className="flex gap-2">
+                <button className="w-8 h-8 rounded-lg border border-slate-100 flex items-center justify-center text-slate-400"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="15 18 9 12 15 6"/></svg></button>
+                <button className="w-8 h-8 rounded-lg bg-blue-600 text-white font-black text-xs flex items-center justify-center">1</button>
+                <button className="w-8 h-8 rounded-lg border border-slate-100 flex items-center justify-center font-bold text-xs text-slate-400">2</button>
+                <button className="w-8 h-8 rounded-lg border border-slate-100 flex items-center justify-center font-bold text-xs text-slate-400">3</button>
+                <button className="w-8 h-8 rounded-lg border border-slate-100 flex items-center justify-center text-slate-600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="9 18 15 12 9 6"/></svg></button>
+            </div>
+        </div>
       </div>
 
       <SubscriptionDetailsDrawer 
         isOpen={isDetailsOpen}
         onClose={() => { setIsDetailsOpen(false); setSelectedItem(null); }}
         data={selectedItem}
-        showActions={true} // Enable assistant buttons
+        showActions={selectedItem?.status === 'PENDING'} 
         onValidate={handleValidateClick}
         onRefuse={handleRefuseClick}
       />

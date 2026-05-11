@@ -12,7 +12,6 @@ import DashboardLayout from './components/layout/DashboardLayout'
 import UsersPage from './pages/UsersPage'
 import UserHistoryPage from './pages/UserHistoryPage'
 import SubscriptionsPage from './pages/SubscriptionsPage'
-import AssistantSubscriptionsPage from './pages/AssistantSubscriptionsPage'
 import StockManagement from './pages/Stock/StockManagement'
 
 // Lazy-loaded auth pages
@@ -79,7 +78,6 @@ function App() {
           <Route path="users" element={<UsersPage />} />
           <Route path="historique" element={<UserHistoryPage />} />
           <Route path="subscriptions" element={<SubscriptionsPage />} />
-          <Route path="assistant/subscriptions" element={<AssistantSubscriptionsPage />} />
           <Route path="settings" element={<div className="p-8"><h1 className="text-2xl font-bold">Paramètres</h1></div>} />
           <Route path="roles-permissions" element={<RolesPermissionsPage />} />
           <Route path="stock" element={<StockManagement />} />

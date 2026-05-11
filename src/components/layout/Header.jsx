@@ -7,7 +7,7 @@ import Input from '../common/Input';
 import useAuth from '@/hooks/useAuth';
 
 const Header = ({ onMenuClick }) => {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const location = useLocation();
   const pathnames = location.pathname.split('/').filter((x) => x);
 
@@ -77,18 +77,18 @@ const Header = ({ onMenuClick }) => {
                     <Avatar.Root className="flex-none">
                       <Avatar.Image
                         className="w-9 h-9 md:w-10 md:h-10 rounded-sm object-cover ring-2 ring-transparent group-hover:ring-[#1428C9]/10 transition-all"
-                        src="https://randomuser.me/api/portraits/women/79.jpg"
-                        alt="vienna"
+                        src={user?.avatar || "https://randomuser.me/api/portraits/women/79.jpg"}
+                        alt={user?.first_name || "vienna"}
                       />
                       <Avatar.Fallback
                         className="flex w-9 h-9 md:w-10 md:h-10 rounded-sm items-center justify-center text-white text-xs font-bold bg-gradient-to-tr from-[#1428C9] to-blue-400"
                       >
-                        AD
+                        {user?.first_name?.[0]}{user?.last_name?.[0]}
                       </Avatar.Fallback>
                     </Avatar.Root>
                     <div className="hidden sm:block text-left">
-                      <p className="text-sm font-bold text-[#111827] leading-none">Admin Oriotel</p>
-                      <p className="text-[11px] text-gray-400 mt-1">Administrateur</p>
+                      <p className="text-sm font-bold text-[#111827] leading-none">{user?.full_name || 'Utilisateur'}</p>
+                      <p className="text-[11px] text-gray-400 mt-1 capitalize">{user?.role || 'Rôle'}</p>
                     </div>
                     <ChevronDown size={14} className="text-gray-400 hidden sm:block" />
                   </div>
@@ -101,8 +101,8 @@ const Header = ({ onMenuClick }) => {
                     align="end"
                   >
                     <div className="px-4 py-3 mb-1 border-b border-gray-50">
-                      <p className="text-sm font-bold text-[#111827] leading-none">Admin Oriotel</p>
-                      <p className="text-[11px] text-gray-500 mt-1.5 font-medium">admin@oriotel.com</p>
+                      <p className="text-sm font-bold text-[#111827] leading-none">{user?.full_name || 'Utilisateur'}</p>
+                      <p className="text-[11px] text-gray-500 mt-1.5 font-medium">{user?.email || 'email@example.com'}</p>
                     </div>
                     <div className="p-1">
                       <DropdownMenu.Item className="outline-none">

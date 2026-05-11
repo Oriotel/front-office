@@ -13,6 +13,8 @@ export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
     try {
+      // Clear any stale session before logging in
+      localStorage.removeItem('auth_token');
       const response = await authService.login(credentials);
       return response;
     } catch (error) {

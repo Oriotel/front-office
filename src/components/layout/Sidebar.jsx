@@ -1,5 +1,7 @@
 import { memo } from 'react';
 import { useLocation, Link } from "react-router-dom";
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../store/slices/authSlice';
 import {
   LayoutDashboard,
   Users,
@@ -18,26 +20,32 @@ import {
 } from "lucide-react";
 import { cn } from '../../utils/cn';
 
-const NAVIGATION = [
-  { name: "Tableau de bord", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
-  { name: "Utilisateurs", href: "/users", icon: <Users className="w-5 h-5" /> },
-  { name: "Rôles & Permissions", href: "/roles", icon: <ShieldCheck className="w-5 h-5" /> },
-  { name: "Historique", href: "/historique", icon: <Activity className="w-5 h-5" /> },
-  { name: "Souscriptions", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> },
-  { name: "Dossiers", href: "/dossiers", icon: <Folder className="w-5 h-5" /> },
-  { name: "Stock", href: "/stock", icon: <Box className="w-5 h-5" /> },
-  { name: "Communication", href: "/communication", icon: <MessageSquare className="w-5 h-5" /> },
-  { name: "Tâches", href: "/tasks", icon: <CheckSquare className="w-5 h-5" /> },
-  { name: "Temps", href: "/time", icon: <Clock className="w-5 h-5" /> },
-];
-
-const NAVS_FOOTER = [
-  { name: "Aide", href: "/help", icon: <HelpCircle className="w-5 h-5" /> },
-  { name: "Paramètres", href: "/settings", icon: <Settings className="w-5 h-5" /> },
-];
-
 const Sidebar = memo(({ isOpen, onClose }) => {
   const location = useLocation();
+  const user = useSelector(selectUser);
+  const isAssistant = user?.role?.toLowerCase() === 'assistant' || user?.email === 'assistante@oriotel.com';
+
+  const NAVIGATION = [
+    { name: "Tableau de bord", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
+    { name: "Utilisateurs", href: "/dashboard/users", icon: <Users className="w-5 h-5" /> },
+    { name: "Rôles & Permissions", href: "/dashboard/roles-permissions", icon: <ShieldCheck className="w-5 h-5" /> },
+    { name: "Historique", href: "/dashboard/historique", icon: <Activity className="w-5 h-5" /> },
+    { 
+      name: "Souscriptions", 
+      href: "/dashboard/subscriptions",
+      icon: <CreditCard className="w-5 h-5" /> 
+    },
+    { name: "Dossiers", href: "/dashboard/dossiers", icon: <Folder className="w-5 h-5" /> },
+    { name: "Stock", href: "/dashboard/stock", icon: <Box className="w-5 h-5" /> },
+    { name: "Communication", href: "/dashboard/communication", icon: <MessageSquare className="w-5 h-5" /> },
+    { name: "Tâches", href: "/dashboard/tasks", icon: <CheckSquare className="w-5 h-5" /> },
+    { name: "Temps", href: "/dashboard/time", icon: <Clock className="w-5 h-5" /> },
+  ];
+
+  const NAVS_FOOTER = [
+    { name: "Aide", href: "/dashboard/help", icon: <HelpCircle className="w-5 h-5" /> },
+    { name: "Paramètres", href: "/dashboard/settings", icon: <Settings className="w-5 h-5" /> },
+  ];
 
   return (
     <nav className={cn(

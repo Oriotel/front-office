@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 import { Search, Plus, Filter, Download, FileText, FileSpreadsheet, FileCode } from 'lucide-react';
 
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../store/slices/authSlice';
+
 const SubscriptionFilters = ({ onAddClick, onSearch, onExport, onFilterToggle }) => {
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const user = useSelector(selectUser);
+  const isAssistant = user?.role?.toLowerCase() === 'assistant' || user?.email === 'assistante@oriotel.com';
 
   const handleExport = (format) => {
     onExport(format);
@@ -69,10 +74,12 @@ const SubscriptionFilters = ({ onAddClick, onSearch, onExport, onFilterToggle })
           )}
         </div>
 
-        <button className="btn-premium btn-primary" onClick={onAddClick}>
-          <Plus size={18} />
-          <span>Add Subscription</span>
-        </button>
+        {onAddClick && !isAssistant && (
+          <button className="btn-premium btn-primary" onClick={onAddClick}>
+            <Plus size={18} />
+            <span>Add Subscription</span>
+          </button>
+        )}
       </div>
     </div>
   );

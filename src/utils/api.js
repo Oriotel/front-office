@@ -54,9 +54,20 @@ axiosInstance.interceptors.response.use(
     // Return a standardized error object
     if (error.response) {
       // Server responded with a status other than 200 range
-      const message = error.response.data?.message || `Erreur HTTP ${error.response.status}`;
+      const data = error.response.data;
+      
+      // Handle Laravel validation errors specifically
+      if (error.response.status === 422 && data.errors) {
+        // Extract the first validation error message
+        const firstErrorKey = Object.keys(data.errors)[0];
+        const firstErrorMessage = data.errors[firstErrorKey][0];
+        return Promise.reject(new Error(firstErrorMessage || data.message || 'Données invalides'));
+      }
+
+      const message = data?.message || `Erreur HTTP ${error.response.status}`;
       return Promise.reject(new Error(message));
     } else if (error.request) {
+
       // Request was made but no response was received
       return Promise.reject(new Error('Erreur de connexion au serveur. Vérifiez votre connexion internet.'));
     } else {

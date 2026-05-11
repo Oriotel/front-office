@@ -1,8 +1,8 @@
 import React from 'react';
 import { clsx } from 'clsx';
-import { Shield, Plus, Check } from 'lucide-react';
+import { Shield, Plus, Check, Pencil, Trash2 } from 'lucide-react';
 
-const RoleList = ({ roles, selectedRoles, onToggleRole, onAddRole, onDoubleClickRole }) => {
+const RoleList = ({ roles, selectedRoles, onToggleRole, onAddRole, onDoubleClickRole, onEditRole, onDeleteRole }) => {
   return (
     <div className="h-[400px] overflow-y-auto custom-scrollbar border border-gray-100 bg-white p-4">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -21,17 +21,41 @@ const RoleList = ({ roles, selectedRoles, onToggleRole, onAddRole, onDoubleClick
         {roles.map((role) => {
           const isSelected = selectedRoles.includes(role.id);
           return (
-            <button
+            <div
               key={role.id}
               onClick={() => onToggleRole(role.id)}
               onDoubleClick={() => onDoubleClickRole && onDoubleClickRole(role.id)}
               className={clsx(
-                "text-left p-5 transition-all duration-200 border flex flex-col gap-4 group relative overflow-hidden min-h-[120px]",
+                "group relative cursor-pointer text-left p-5 transition-all duration-200 border flex flex-col gap-4 overflow-hidden min-h-[120px]",
                 isSelected
                   ? "bg-primary/5 border-primary"
                   : "bg-white border-gray-100 hover:border-gray-300 hover:bg-gray-50"
               )}
             >
+              {/* Action Overlay (Hover) */}
+              {!role.isStatic && (
+                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditRole(role);
+                    }}
+                    className="p-1.5 bg-white shadow-sm border border-gray-100 text-gray-400 hover:text-primary transition-colors"
+                  >
+                    <Pencil size={14} />
+                  </button>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteRole(role.id);
+                    }}
+                    className="p-1.5 bg-white shadow-sm border border-gray-100 text-gray-400 hover:text-red-500 transition-colors"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              )}
+
               <div className="flex items-center justify-between w-full">
                 <div className={clsx(
                   "w-10 h-10 flex items-center justify-center text-white transition-all duration-200 group-hover:scale-110",
@@ -57,7 +81,7 @@ const RoleList = ({ roles, selectedRoles, onToggleRole, onAddRole, onDoubleClick
                   {role.name}
                 </h4>
               </div>
-            </button>
+            </div>
           );
         })}
       </div>

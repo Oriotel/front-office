@@ -5,6 +5,7 @@ import UserList from './components/UserList';
 import { Save, ShieldCheck, X } from 'lucide-react';
 import { clsx } from 'clsx';
 import api from '../../services/api';
+import { USER_ROLES } from '../../constants/users';
 
 const RolesPermissionsPage = () => {
   const [step, setStep] = useState(1);
@@ -23,6 +24,8 @@ const RolesPermissionsPage = () => {
   const [newRoleName, setNewRoleName] = useState('');
 
   const [permissions, setPermissions] = useState({});
+  const [editingRole, setEditingRole] = useState(null);
+
 
   // Fetch Roles on mount
   React.useEffect(() => {
@@ -33,14 +36,31 @@ const RolesPermissionsPage = () => {
     try {
       const response = await api.get('/v1/roles-permissions/roles');
       if (response.data.success) {
-        const mappedRoles = response.data.roles.map(r => ({
+        const apiRoles = response.data.roles.map(r => ({
           ...r,
           users: r.users_count || 0
         }));
-        setRoles(mappedRoles);
+
+        // Merge with static roles from constants
+        const staticRoles = Object.values(USER_ROLES).map((roleName, index) => ({
+          id: `static-${roleName}`,
+          name: roleName,
+          color: index % 2 === 0 ? 'bg-primary' : 'bg-orange-500',
+          users: 0,
+          isStatic: true
+        }));
+
+        // Filter out static roles that already exist in API roles (by name)
+        const filteredStatic = staticRoles.filter(
+          sr => !apiRoles.some(ar => ar.name.toLowerCase() === sr.name.toLowerCase())
+        );
+
+        const combinedRoles = [...apiRoles, ...filteredStatic];
+        setRoles(combinedRoles);
+        
         // Default to first role if none selected
-        if (!selectedRole && mappedRoles.length > 0) {
-          setSelectedRole(mappedRoles[0].id);
+        if (!selectedRole && combinedRoles.length > 0) {
+          setSelectedRole(combinedRoles[0].id);
         }
       }
     } catch (error) {
@@ -53,7 +73,8 @@ const RolesPermissionsPage = () => {
     if (selectedRole && step === 2) {
       fetchRoleUsers();
     }
-  }, [selectedRole, step]);
+  }, [selectedRole, step, searchQuery]);
+
 
   const fetchRoleUsers = async () => {
     try {
@@ -141,11 +162,61 @@ const RolesPermissionsPage = () => {
       }
     } catch (error) {
       console.error("Error creating role:", error);
-      const message = error.response?.data?.message || "Erreur lors de la création du rôle.";
-      const detail = error.response?.data?.error || (error.response?.data?.errors ? Object.values(error.response.data.errors).flat().join(', ') : '');
-      alert(`${message} ${detail}`);
+      alert("Erreur lors de la création du rôle.");
     }
   };
+
+  const handleUpdateRole = async () => {
+    if (!editingRole || newRoleName.trim() === '') return;
+    try {
+      const response = await api.put(`/v1/roles-permissions/roles/${editingRole.id}`, {
+        name: newRoleName,
+      });
+      if (response.data.success) {
+        setEditingRole(null);
+        setNewRoleName('');
+        await fetchRoles();
+      }
+    } catch (error) {
+      console.error("Error updating role:", error);
+      alert("Erreur lors de la mise à jour du rôle.");
+    }
+  };
+
+  const handleDeleteRole = async (roleId) => {
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce rôle ?")) return;
+    try {
+      const response = await api.delete(`/v1/roles-permissions/roles/${roleId}`);
+      if (response.data.success) {
+        if (selectedRole === roleId) setSelectedRole(null);
+        await fetchRoles();
+      }
+    } catch (error) {
+      console.error("Error deleting role:", error);
+      alert("Erreur lors de la suppression du rôle.");
+    }
+  };
+
+  const handleAssignRole = async (userId, roleId) => {
+    try {
+      // We find the role name to send it to the users update endpoint
+      const role = roles.find(r => r.id === roleId);
+      if (!role) return;
+
+      const response = await api.put(`/v1/users/${userId}`, {
+        role: role.name.toLowerCase()
+      });
+      
+      if (response.data) {
+        // Refresh the list
+        await fetchRoleUsers();
+      }
+    } catch (error) {
+      console.error("Error assigning role:", error);
+      alert("Erreur lors de l'attribution du rôle.");
+    }
+  };
+
 
   const handleSavePermissions = async () => {
     setLoading(true);
@@ -198,21 +269,31 @@ const RolesPermissionsPage = () => {
 
           {/* ── STEP 1 ── */}
           {step === 1 && (
-            <div className="animate-in fade-in duration-500">
-              <div className="flex items-center justify-between mb-6">
+            <div className="animate-in fade-in duration-500 flex flex-col h-full">
+              <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-50">
                 <div>
                   <h2 className="text-lg font-bold text-text-dark tracking-tight">Étape 1 : Choisir un rôle</h2>
                   <p className="text-xs text-gray-500 mt-1">Sélectionnez le rôle à configurer</p>
                 </div>
-                {selectedRole && (
+                <div className="flex items-center gap-4">
+                  {selectedRole && (
+                    <button
+                      onClick={() => setSelectedRole(null)}
+                      className="text-xs text-gray-400 hover:text-red-500 underline transition-colors"
+                    >
+                      Désélectionner
+                    </button>
+                  )}
                   <button
-                    onClick={() => setSelectedRole(null)}
-                    className="text-xs text-gray-400 hover:text-red-500 underline transition-colors"
+                    onClick={() => setStep(2)}
+                    disabled={!selectedRole}
+                    className="px-8 py-3 bg-primary text-white text-sm font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   >
-                    Désélectionner
+                    Suivant →
                   </button>
-                )}
+                </div>
               </div>
+              
               <RoleList
                 roles={displayRoles}
                 selectedRoles={selectedRole ? [selectedRole] : []}
@@ -221,21 +302,26 @@ const RolesPermissionsPage = () => {
                   handleSelectRole(roleId);
                   setStep(2);
                 }}
-                onAddRole={() => setIsModalOpen(true)}
+                onAddRole={() => {
+                  setEditingRole(null);
+                  setNewRoleName('');
+                  setIsModalOpen(true);
+                }}
+                onEditRole={(role) => {
+                  setEditingRole(role);
+                  setNewRoleName(role.name);
+                  setIsModalOpen(true);
+                }}
+                onDeleteRole={handleDeleteRole}
               />
-              <div className="mt-8 flex justify-between items-center">
+
+              
+              <div className="mt-8 pt-4 border-t border-gray-50">
                 <p className="text-xs text-gray-400">
                   {!selectedRole
                     ? 'Veuillez sélectionner un rôle.'
                     : `Rôle sélectionné : ${selectedRoleName}`}
                 </p>
-                <button
-                  onClick={() => setStep(2)}
-                  disabled={!selectedRole}
-                  className="px-8 py-3 bg-primary text-white text-sm font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  Suivant →
-                </button>
               </div>
             </div>
           )}
@@ -243,11 +329,27 @@ const RolesPermissionsPage = () => {
           {/* ── STEP 2 ── */}
           {step === 2 && (
             <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-50">
                 <div>
                   <h2 className="text-lg font-bold text-text-dark tracking-tight">Étape 2 : Définir la cible</h2>
                   <p className="text-xs text-gray-500 mt-1">Sélection multiple — {selectedUsers.length} collaborateur(s) sélectionné(s)</p>
                 </div>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => setStep(1)} className="px-6 py-3 bg-gray-100 text-gray-600 text-sm font-bold uppercase tracking-wider hover:bg-gray-200 transition-colors">
+                    ← Retour
+                  </button>
+                  <button onClick={() => setStep(3)} className="px-8 py-3 bg-primary text-white text-sm font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors">
+                    {selectedUsers.length > 0
+                      ? `Configurer ${selectedUsers.length} →`
+                      : 'Configurer le groupe →'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm text-gray-500">
+                  Rôle filtré : <strong className="text-primary font-black">{selectedRoleName}</strong>
+                </p>
                 {selectedUsers.length > 0 && (
                   <button
                     onClick={() => setSelectedUsers([])}
@@ -257,9 +359,6 @@ const RolesPermissionsPage = () => {
                   </button>
                 )}
               </div>
-              <p className="text-sm text-gray-500 mb-4">
-                Rôle filtré : <strong className="text-primary font-black">{selectedRoleName}</strong>. Passez cette étape pour appliquer au rôle complet.
-              </p>
 
               <UserList
                 users={roleUsers}
@@ -268,75 +367,60 @@ const RolesPermissionsPage = () => {
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
                 roles={roles}
-                onAssignRole={(userId, roleId) => {
-                  // This could be an API call to reassign user role
-                  console.log("Assign role", userId, roleId);
-                }}
+                onAssignRole={handleAssignRole}
               />
 
-              <div className="mt-8 flex justify-between items-center">
-                <button onClick={() => setStep(1)} className="px-8 py-3 bg-gray-100 text-gray-600 text-sm font-bold uppercase tracking-wider hover:bg-gray-200 transition-colors">
-                  ← Retour
-                </button>
-                <button onClick={() => setStep(3)} className="px-8 py-3 bg-primary text-white text-sm font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors">
-                  {selectedUsers.length > 0
-                    ? `Configurer ${selectedUsers.length} collaborateur(s) →`
-                    : 'Configurer le(s) rôle(s) complet(s) →'}
-                </button>
-              </div>
             </div>
           )}
 
           {/* ── STEP 3 ── */}
           {step === 3 && (
             <div className="animate-in fade-in slide-in-from-right-4 duration-500 space-y-8">
-              <div className="border-b border-gray-100 pb-4 flex flex-wrap gap-4 items-start justify-between">
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-50">
                 <div>
                   <h2 className="text-lg font-bold text-text-dark tracking-tight">
                     Étape 3 : Permissions {selectedUsers.length > 0 ? 'individuelles' : 'de groupe'}
                   </h2>
                   <p className="text-xs text-gray-500 mt-1">
                     {selectedUsers.length > 0
-                      ? `Appliqué à : ${selectedUsers.map(u => (u.name || 'Utilisateur').split(' ')[0]).join(', ')}`
+                      ? `Appliqué à : ${selectedUsers.length} collaborateur(s)`
                       : `Appliqué au rôle : ${selectedRoleName}`}
                   </p>
                 </div>
-
-                {/* Selection summary pills */}
-                <div className="flex flex-wrap gap-2">
-                  {selectedUsers.length > 0
-                    ? selectedUsers.map(u => (
-                      <span key={u.id} className="flex items-center gap-2 px-3 py-1 bg-primary/5 border border-primary/20 text-primary text-[10px] font-bold uppercase">
-                        <img src={u.avatar || ''} className="w-4 h-4 object-cover" alt="" />
-                        {(u.name || 'Utilisateur').split(' ')[0]}
-                      </span>
-                    ))
-                    : (
-                      <span className="px-3 py-1 bg-amber-100 border border-amber-200 text-amber-800 text-[10px] font-bold uppercase">
-                        {selectedRoleName}
-                      </span>
-                    )
-                  }
+                <div className="flex items-center gap-3">
+                  <button onClick={() => setStep(2)} className="px-6 py-3 bg-gray-100 text-gray-600 text-sm font-bold uppercase tracking-wider hover:bg-gray-200 transition-colors">
+                    ← Retour
+                  </button>
+                  <button 
+                    onClick={handleSavePermissions}
+                    disabled={loading}
+                    className="px-10 py-3 bg-primary text-white text-sm font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors flex items-center gap-3 disabled:opacity-50"
+                  >
+                    <Save size={18} />
+                    {loading ? '...' : 'Sauvegarder'}
+                  </button>
                 </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {selectedUsers.length > 0
+                  ? selectedUsers.map(u => (
+                    <span key={u.id} className="flex items-center gap-2 px-3 py-1 bg-primary/5 border border-primary/20 text-primary text-[10px] font-bold uppercase">
+                      <img src={u.avatar || ''} className="w-4 h-4 object-cover" alt="" />
+                      {(u.name || 'Utilisateur').split(' ')[0]}
+                    </span>
+                  ))
+                  : (
+                    <span className="px-3 py-1 bg-amber-100 border border-amber-200 text-amber-800 text-[10px] font-bold uppercase">
+                      {selectedRoleName}
+                    </span>
+                  )
+                }
               </div>
 
               <div className="space-y-4">
                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Matrice des modules</h3>
                 <PermissionMatrix permissions={permissions} onToggle={handleTogglePermission} />
-              </div>
-
-              <div className="flex justify-between pt-6 border-t border-gray-100">
-                <button onClick={() => setStep(2)} className="px-8 py-3 bg-gray-100 text-gray-600 text-sm font-bold uppercase tracking-wider hover:bg-gray-200 transition-colors">
-                  ← Modifier la cible
-                </button>
-                <button 
-                  onClick={handleSavePermissions}
-                  disabled={loading}
-                  className="px-10 py-3 bg-primary text-white text-sm font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors flex items-center gap-3 disabled:opacity-50"
-                >
-                  <Save size={18} />
-                  {loading ? 'Enregistrement...' : 'Sauvegarder les droits'}
-                </button>
               </div>
             </div>
           )}
@@ -348,8 +432,18 @@ const RolesPermissionsPage = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-md border border-gray-200 flex flex-col">
             <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50">
-              <h3 className="font-bold text-lg text-text-dark">Ajouter un nouveau rôle</h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-red-500"><X size={20} /></button>
+              <h3 className="font-bold text-lg text-text-dark">
+                {editingRole ? 'Modifier le rôle' : 'Ajouter un nouveau rôle'}
+              </h3>
+              <button 
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setEditingRole(null);
+                }} 
+                className="text-gray-400 hover:text-red-500"
+              >
+                <X size={20} />
+              </button>
             </div>
             <div className="p-6">
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Nom du rôle</label>
@@ -357,20 +451,31 @@ const RolesPermissionsPage = () => {
                 type="text"
                 value={newRoleName}
                 onChange={(e) => setNewRoleName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAddRole()}
+                onKeyDown={(e) => e.key === 'Enter' && (editingRole ? handleUpdateRole() : handleAddRole())}
                 placeholder="Ex: Responsable RH"
                 autoFocus
                 className="w-full border-2 border-gray-200 p-3 outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all"
               />
             </div>
             <div className="p-5 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50">
-              <button onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 bg-white border border-gray-300 text-gray-600 font-bold text-sm uppercase hover:bg-gray-50">
+              <button 
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setEditingRole(null);
+                }} 
+                className="px-5 py-2.5 bg-white border border-gray-300 text-gray-600 font-bold text-sm uppercase hover:bg-gray-50"
+              >
                 Annuler
               </button>
-              <button onClick={handleAddRole} disabled={!newRoleName.trim()} className="px-5 py-2.5 bg-primary text-white font-bold text-sm uppercase hover:bg-primary/90 disabled:opacity-50">
-                Créer
+              <button 
+                onClick={editingRole ? handleUpdateRole : handleAddRole} 
+                disabled={!newRoleName.trim()} 
+                className="px-5 py-2.5 bg-primary text-white font-bold text-sm uppercase hover:bg-primary/90 disabled:opacity-50"
+              >
+                {editingRole ? 'Enregistrer' : 'Créer'}
               </button>
             </div>
+
           </div>
         </div>
       )}

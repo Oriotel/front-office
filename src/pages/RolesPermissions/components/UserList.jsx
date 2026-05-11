@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { clsx } from 'clsx';
-import { Search, UserPlus, ChevronDown, Check } from 'lucide-react';
+import { Search, UserPlus, ChevronDown, Check, Shield } from 'lucide-react';
 
 const UserList = ({ users, selectedUserIds, onToggleUser, searchQuery, setSearchQuery, roles, onAssignRole }) => {
   return (
-    <div className="h-[500px] flex flex-col border border-gray-100 bg-white">
+    <div className="h-[500px] flex flex-col border border-gray-100 bg-white overflow-visible">
       {/* Search Bar */}
       <div className="p-4 border-b border-gray-100 bg-gray-50/50">
         <div className="relative">
@@ -20,7 +20,7 @@ const UserList = ({ users, selectedUserIds, onToggleUser, searchQuery, setSearch
       </div>
 
       {/* Scrollable list */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-6">
+      <div className="flex-1 overflow-visible p-4 space-y-6">
 
         {/* Unified Users Table */}
         <div>
@@ -32,7 +32,7 @@ const UserList = ({ users, selectedUserIds, onToggleUser, searchQuery, setSearch
               <p className="text-gray-400 font-medium">Aucun collaborateur trouvé</p>
             </div>
           ) : (
-            <div className="bg-white rounded-sm border border-gray-100 overflow-hidden transition-all">
+            <div className="bg-white rounded-sm border border-gray-100 transition-all">
               <table className="w-full text-left border-collapse">
                 <thead className="bg-[#F8FAFC]">
                   <tr>
@@ -65,7 +65,10 @@ const UserList = ({ users, selectedUserIds, onToggleUser, searchQuery, setSearch
 
 /* ── Unified Table Row for all users ── */
 const UserRow = ({ user, isSelected, onToggle, roles, onAssignRole }) => {
-  const currentRole = roles.find(r => r.id === user.roleId);
+  const currentRole = roles.find(r => 
+    r.id === user.roleId || 
+    (user.role && r.name.toLowerCase() === user.role.toLowerCase())
+  );
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -136,26 +139,26 @@ const UserRow = ({ user, isSelected, onToggle, roles, onAssignRole }) => {
             className={clsx(
               "inline-flex items-center gap-2 px-3 py-1.5 transition-all text-[10px] font-bold uppercase border",
               currentRole 
-                ? "bg-gray-50 border-gray-200 text-gray-700 hover:border-gray-300" 
+                ? "bg-white border-primary text-primary hover:bg-primary/5" 
                 : "bg-primary border-primary text-white hover:bg-primary/90"
             )}
           >
             {currentRole ? (
               <>
-                <div className={clsx("w-2 h-2", currentRole.color || "bg-gray-500")} />
+                <Shield size={12} className="stroke-[3]" />
                 <span>{currentRole.name}</span>
               </>
             ) : (
               <>
-                <UserPlus size={12} />
-                <span>Rôle</span>
+                <UserPlus size={12} className="stroke-[3]" />
+                <span>Rôle +</span>
               </>
             )}
-            <ChevronDown size={11} className={clsx("transition-transform", isOpen && "rotate-180")} />
+            <ChevronDown size={11} className={clsx("transition-transform opacity-60", isOpen && "rotate-180")} />
           </button>
 
           {isOpen && (
-            <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-gray-200 z-[99] shadow-xl text-left">
+            <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-gray-200 z-[9999] shadow-xl text-left">
               <div className="p-2 border-b border-gray-100 bg-gray-50">
                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                   {currentRole ? "Modifier le rôle de" : "Attribuer un rôle à"}

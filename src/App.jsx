@@ -14,6 +14,8 @@ import DashboardLayout from './components/layout/DashboardLayout'
 import UsersPage from './pages/UsersPage'
 import UserHistoryPage from './pages/UserHistoryPage'
 import StockManagement from './pages/Stock/StockManagement'
+import WorkTimeManagement from './pages/WorkTime/WorkTimeManagement'
+
 
 // Lazy-loaded auth pages
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
@@ -81,6 +83,8 @@ function App() {
           <Route path="settings" element={<div className="p-8"><h1 className="text-2xl font-bold">Paramètres</h1></div>} />
           <Route path="roles-permissions" element={<RolesPermissionsPage />} />
           <Route path="stock" element={<StockManagement />} />
+          <Route path="time" element={<WorkTimeManagement />} />
+
         </Route>
 
         {/* Default redirect */}

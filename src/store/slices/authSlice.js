@@ -38,8 +38,20 @@ export const verifyRegistrationCode = createAsyncThunk(
   async (data, { rejectWithValue, getState }) => {
     try {
       const state = getState();
-      const user_id = state.auth.registrationUserId;
-      const response = await authService.verifyRegistration({ ...data, user_id });
+      const email = state.auth.registrationEmail || localStorage.getItem('registration_email');
+      const response = await authService.verifyRegistration({ ...data, email });
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const resendRegistrationCode = createAsyncThunk(
+  'auth/resendRegistration',
+  async (email, { rejectWithValue }) => {
+    try {
+      const response = await authService.resendRegistrationCode(email);
       return response;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -118,7 +130,7 @@ const initialState = {
   error: null,
   registrationStatus: REGISTRATION_STATUS.IDLE,
   registrationMessage: null,
-  registrationUserId: localStorage.getItem('registration_user_id') || null,
+  registrationEmail: localStorage.getItem('registration_email') || null,
   passwordChangeRequired: false,
   twoFactorPending: false,
   authStep: !!localStorage.getItem('auth_token') ? AUTH_STEPS.AUTHENTICATED : AUTH_STEPS.LOGIN,
@@ -196,11 +208,10 @@ const authSlice = createSlice({
         // Proceed to verification step
         state.registrationStatus = REGISTRATION_STATUS.VERIFICATION_REQUIRED;
         state.registrationMessage = action.payload.message;
-        // The backend should return the user id so we can verify the code
-        const userId = action.payload.user?.id || action.payload.user_id || action.payload.id;
-        state.registrationUserId = userId;
-        if (userId) {
-          localStorage.setItem('registration_user_id', userId);
+        const email = action.payload.email;
+        state.registrationEmail = email;
+        if (email) {
+          localStorage.setItem('registration_email', email);
         }
       })
       .addCase(registerUser.rejected, (state, action) => {
@@ -219,8 +230,8 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.registrationStatus = REGISTRATION_STATUS.SUCCESS;
         state.registrationMessage = action.payload.message || 'Votre demande a été soumise avec succès.';
-        state.registrationUserId = null;
-        localStorage.removeItem('registration_user_id');
+        state.registrationEmail = null;
+        localStorage.removeItem('registration_email');
       })
       .addCase(verifyRegistrationCode.rejected, (state, action) => {
         state.isLoading = false;
@@ -281,7 +292,7 @@ const authSlice = createSlice({
       .addCase(logoutUser.fulfilled, () => {
         localStorage.removeItem('auth_token');
         localStorage.removeItem('2fa_user_id');
-        localStorage.removeItem('registration_user_id');
+        localStorage.removeItem('registration_email');
         return {
           user: null,
           token: null,
@@ -291,7 +302,7 @@ const authSlice = createSlice({
           error: null,
           registrationStatus: REGISTRATION_STATUS.IDLE,
           registrationMessage: null,
-          registrationUserId: null,
+          registrationEmail: null,
           passwordChangeRequired: false,
           twoFactorPending: false,
           authStep: AUTH_STEPS.LOGIN,
@@ -325,6 +336,6 @@ export const selectIsLoading = (state) => state.auth.isLoading;
 export const selectAuthError = (state) => state.auth.error;
 export const selectAuthStep = (state) => state.auth.authStep;
 export const selectRegistrationStatus = (state) => state.auth.registrationStatus;
-export const selectRegistrationUserId = (state) => state.auth.registrationUserId;
+export const selectRegistrationEmail = (state) => state.auth.registrationEmail;
 
 export default authSlice.reducer;

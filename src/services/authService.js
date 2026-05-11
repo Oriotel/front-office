@@ -63,10 +63,19 @@ class AuthService {
 
   /**
    * Verify email during registration
-   * @param {Object} data - { user_id, code }
+   * @param {Object} data - { email, code }
    */
-  async verifyRegistration({ user_id, code }) {
-    const response = await api.post(AUTH_ENDPOINTS.VERIFY_REGISTRATION, { user_id, code });
+  async verifyRegistration({ email, code }) {
+    const response = await api.post(AUTH_ENDPOINTS.VERIFY_REGISTRATION, { email, code });
+    return response;
+  }
+
+  /**
+   * Resend verification code during registration
+   * @param {string} email
+   */
+  async resendRegistrationCode(email) {
+    const response = await api.post(AUTH_ENDPOINTS.RESEND_REGISTRATION, { email });
     return response;
   }
 

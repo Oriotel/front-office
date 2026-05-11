@@ -6,14 +6,25 @@ import Button from '@/components/common/Button';
 import Alert from '@/components/common/Alert';
 
 const RegisterVerifyForm = () => {
-  const { verifyRegistrationCode, isLoading, error, clearError, registrationStatus, registrationMessage } = useAuth();
+  const { 
+    verifyRegistrationCode, 
+    resendRegistrationCode,
+    isLoading, 
+    error, 
+    clearError, 
+    registrationStatus, 
+    registrationMessage,
+    registrationEmail
+  } = useAuth();
   
+  const [resendSuccess, setResendSuccess] = useState(null);
+  const [resendLoading, setResendLoading] = useState(false);
   const [verificationCode, setVerificationCode] = useState(['', '', '', '', '', '']);
   const inputRefs = useRef([]);
 
   // If there's no registration pending, they shouldn't be on this page.
-  const registrationUserId = localStorage.getItem('registration_user_id');
-  if (!registrationUserId && registrationStatus !== 'success') {
+  const email = registrationEmail || localStorage.getItem('registration_email');
+  if (!email && registrationStatus !== 'success') {
     return <Navigate to="/register" replace />;
   }
 
@@ -45,7 +56,20 @@ const RegisterVerifyForm = () => {
     e.preventDefault();
     const codeStr = verificationCode.join('');
     if (codeStr.length === 6) {
-      await verifyRegistrationCode({ code: codeStr });
+      await verifyRegistrationCode({ code: codeStr, email });
+    }
+  };
+
+  const onResendCode = async () => {
+    setResendLoading(true);
+    setResendSuccess(null);
+    try {
+      await resendRegistrationCode();
+      setResendSuccess('Un nouveau code a été envoyé.');
+    } catch (err) {
+      // Error handled by hook
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -111,6 +135,29 @@ const RegisterVerifyForm = () => {
           >
             Vérifier le code
           </Button>
+        </div>
+
+        <div className="flex flex-col items-center gap-4 mt-8">
+          <button
+            type="button"
+            onClick={onResendCode}
+            disabled={resendLoading}
+            className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors disabled:opacity-50"
+          >
+            {resendLoading ? 'Envoi...' : 'Renvoyer le code'}
+          </button>
+          
+          {resendSuccess && (
+            <p className="text-xs text-green-400 font-medium">{resendSuccess}</p>
+          )}
+
+          <Link 
+            to="/register" 
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors mt-2"
+          >
+            <ArrowLeft size={16} />
+            <span>Retour à l&apos;inscription</span>
+          </Link>
         </div>
       </form>
     </div>

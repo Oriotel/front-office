@@ -1,0 +1,36 @@
+/* Custom Scrollbar for Communication Module */
+.communication-page *::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.communication-page *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.communication-page *::-webkit-scrollbar-thumb {
+  background: #E2E8F0;
+  border-radius: 10px;
+}
+
+.communication-page *::-webkit-scrollbar-thumb:hover {
+  background: #CBD5E1;
+}
+
+/* Firefox scrollbar */
+.communication-page * {
+  scrollbar-width: thin;
+  scrollbar-color: #E2E8F0 transparent;
+}
+
+/* Responsive fixes for mobile browsers */
+@media (max-width: 768px) {
+  .communication-page {
+    height: calc(100vh - 120px) !important;
+  }
+}
+
+/* Smooth transitions for panels */
+.communication-page .flex-shrink-0 {
+  transition: width 0.3s ease-in-out, transform 0.3s ease-in-out;
+}

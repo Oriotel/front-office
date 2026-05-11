@@ -147,6 +147,36 @@ const RolesPermissionsPage = () => {
     }));
   };
 
+  const handleToggleModule = (module, ACTIONS) => {
+    setPermissions(prev => {
+      const modulePerms = prev[module] || {};
+      const allChecked = ACTIONS.every(action => modulePerms[action]);
+      const newModulePerms = {};
+      ACTIONS.forEach(action => {
+        newModulePerms[action] = !allChecked;
+      });
+      return {
+        ...prev,
+        [module]: newModulePerms
+      };
+    });
+  };
+
+  const handleToggleAction = (action, MODULES) => {
+    setPermissions(prev => {
+      const newPerms = { ...prev };
+      const allChecked = MODULES.every(module => prev[module]?.[action]);
+      MODULES.forEach(module => {
+        newPerms[module] = {
+          ...(newPerms[module] || {}),
+          [action]: !allChecked
+        };
+      });
+      return newPerms;
+    });
+  };
+
+
   const handleAddRole = async () => {
     if (newRoleName.trim() === '') return;
     try {
@@ -420,7 +450,13 @@ const RolesPermissionsPage = () => {
 
               <div className="space-y-4">
                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Matrice des modules</h3>
-                <PermissionMatrix permissions={permissions} onToggle={handleTogglePermission} />
+                <PermissionMatrix 
+                  permissions={permissions} 
+                  onToggle={handleTogglePermission} 
+                  onToggleModule={handleToggleModule}
+                  onToggleAction={handleToggleAction}
+                />
+
               </div>
             </div>
           )}

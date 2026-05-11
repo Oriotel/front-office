@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, FileText, CheckSquare, Package, Clock,
   Wallet, MessageSquare, Users, Settings, ChevronDown,
@@ -12,28 +13,37 @@ const NAV_SECTIONS = [
     id: 'main',
     label: 'MAIN MENU',
     items: [
-      { id: 'dashboard',    label: 'Dashboard',          icon: LayoutDashboard },
-      { id: 'historique',   label: 'Historique',         icon: Activity,      active: true },
-      { id: 'souscription', label: 'Souscriptions',      icon: FileText },
-      { id: 'taches',       label: 'Tâches',             icon: CheckSquare },
-      { id: 'stock',        label: 'Stock',              icon: Package },
-      { id: 'pointage',     label: 'Pointage & Heures',  icon: Clock },
-      { id: 'comptabilite', label: 'Comptabilité',       icon: Wallet },
-      { id: 'communication',label: 'Communication',      icon: MessageSquare },
+      { id: 'dashboard',    label: 'Dashboard',          icon: LayoutDashboard, path: '/dashboard' },
+      { id: 'historique',   label: 'Historique',         icon: Activity,        path: '/historique' },
+      { id: 'subscriptions', label: 'Souscriptions (Anim)', icon: FileText,        path: '/subscriptions' },
+      { id: 'ass-sub',      label: 'Souscriptions (Ass)',  icon: CheckSquare,     path: '/assistant/subscriptions' },
+      { id: 'taches',       label: 'Tâches',             icon: CheckSquare,     path: '/tasks' },
+      { id: 'stock',        label: 'Stock',              icon: Package,         path: '/inventory' },
+      { id: 'pointage',     label: 'Pointage & Heures',  icon: Clock,           path: '/attendance' },
+      { id: 'comptabilite', label: 'Comptabilité',       icon: Wallet,          path: '/accounting' },
+      { id: 'communication',label: 'Communication',      icon: MessageSquare,   path: '/messages' },
     ],
   },
 ];
 
 const BOTTOM_ITEMS = [
-  { id: 'users',    label: 'Utilisateurs', icon: Users },
-  { id: 'settings', label: 'Paramètres',   icon: Settings },
+  { id: 'users',    label: 'Utilisateurs', icon: Users, path: '/users' },
+  { id: 'settings', label: 'Paramètres',   icon: Settings, path: '/settings' },
 ];
 
 const OriotelSidebar = ({ collapsed, onToggle }) => {
   const [openSections, setOpenSections] = useState({ main: true });
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const toggleSection = (id) =>
     setOpenSections(prev => ({ ...prev, [id]: !prev[id] }));
+
+  const isActive = (path) => {
+    if (path === '/' && location.pathname === '/') return true;
+    if (path !== '/' && location.pathname.startsWith(path)) return true;
+    return false;
+  };
 
   return (
     <aside
@@ -92,20 +102,22 @@ const OriotelSidebar = ({ collapsed, onToggle }) => {
             {/* Items */}
             {(collapsed || openSections[section.id]) && section.items.map(item => {
               const Icon = item.icon;
+              const active = isActive(item.path);
               return (
                 <button
                   key={item.id}
+                  onClick={() => navigate(item.path)}
                   className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all group rounded-xl mx-auto"
                   style={{
                     width: 'calc(100% - 16px)',
                     marginLeft: 8,
-                    background: item.active ? `${B.blue}12` : 'transparent',
-                    color:      item.active ? B.blue : '#6b7280',
-                    borderLeft: item.active ? `3px solid ${B.blue}` : '3px solid transparent',
+                    background: active ? `${B.blue}12` : 'transparent',
+                    color:      active ? B.blue : '#6b7280',
+                    borderLeft: active ? `3px solid ${B.blue}` : '3px solid transparent',
                   }}
                   title={collapsed ? item.label : ''}
-                  onMouseEnter={e => { if (!item.active) { e.currentTarget.style.background=`${B.blue}08`; e.currentTarget.style.color=B.blue; } }}
-                  onMouseLeave={e => { if (!item.active) { e.currentTarget.style.background='transparent'; e.currentTarget.style.color='#6b7280'; } }}
+                  onMouseEnter={e => { if (!active) { e.currentTarget.style.background=`${B.blue}08`; e.currentTarget.style.color=B.blue; } }}
+                  onMouseLeave={e => { if (!active) { e.currentTarget.style.background='transparent'; e.currentTarget.style.color='#6b7280'; } }}
                 >
                   <Icon className="w-4 h-4 flex-shrink-0" />
                   {!collapsed && <span>{item.label}</span>}
@@ -120,14 +132,22 @@ const OriotelSidebar = ({ collapsed, onToggle }) => {
       <div className="py-3 space-y-1" style={{ borderTop: 'none' }}>
         {BOTTOM_ITEMS.map(item => {
           const Icon = item.icon;
+          const active = isActive(item.path);
           return (
             <button
               key={item.id}
-              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all rounded-xl"
-              style={{ width:'calc(100% - 16px)', marginLeft:8, color:'#6b7280' }}
+              onClick={() => navigate(item.path)}
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all rounded-xl mx-auto"
+              style={{ 
+                width:'calc(100% - 16px)', 
+                marginLeft:8, 
+                color: active ? B.blue : '#6b7280',
+                background: active ? `${B.blue}12` : 'transparent',
+                borderLeft: active ? `3px solid ${B.blue}` : '3px solid transparent',
+              }}
               title={collapsed ? item.label : ''}
-              onMouseEnter={e => { e.currentTarget.style.background=`${B.blue}08`; e.currentTarget.style.color=B.blue; }}
-              onMouseLeave={e => { e.currentTarget.style.background='transparent'; e.currentTarget.style.color='#6b7280'; }}
+              onMouseEnter={e => { if (!active) { e.currentTarget.style.background=`${B.blue}08`; e.currentTarget.style.color=B.blue; } }}
+              onMouseLeave={e => { if (!active) { e.currentTarget.style.background='transparent'; e.currentTarget.style.color='#6b7280'; } }}
             >
               <Icon className="w-4 h-4 flex-shrink-0" />
               {!collapsed && <span>{item.label}</span>}

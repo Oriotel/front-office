@@ -13,7 +13,8 @@ import {
   Settings,
   HelpCircle,
   ChevronRight,
-  Shield
+  Shield,
+  History
 } from "lucide-react";
 
 const DashboardLayout = () => {
@@ -30,19 +31,20 @@ const DashboardLayout = () => {
   const location = useLocation();
   const navigation = [
     { name: "Tableau de bord", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
-    { name: "Utilisateurs", href: "/users", icon: <Users className="w-5 h-5" /> },
-    { name: "Rôles", href: "/roles-permissions", icon: <Shield className="w-5 h-5" /> },
-    { name: "Souscriptions", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> },
-    { name: "Dossiers", href: "/dossiers", icon: <Folder className="w-5 h-5" /> },
-    { name: "Stock", href: "/stock", icon: <Box className="w-5 h-5" /> },
-    { name: "Communication", href: "/communication", icon: <MessageSquare className="w-5 h-5" /> },
-    { name: "Tâches", href: "/tasks", icon: <CheckSquare className="w-5 h-5" /> },
-    { name: "Temps", href: "/time", icon: <Clock className="w-5 h-5" /> },
+    { name: "Utilisateurs", href: "/dashboard/users", icon: <Users className="w-5 h-5" /> },
+    { name: "Rôles", href: "/dashboard/roles-permissions", icon: <Shield className="w-5 h-5" /> },
+    { name: "Historique", href: "/dashboard/historique", icon: <History className="w-5 h-5" /> },
+    { name: "Souscriptions", href: "/dashboard/subscriptions", icon: <CreditCard className="w-5 h-5" /> },
+    { name: "Dossiers", href: "/dashboard/dossiers", icon: <Folder className="w-5 h-5" /> },
+    { name: "Stock", href: "/dashboard/stock", icon: <Box className="w-5 h-5" /> },
+    { name: "Communication", href: "/dashboard/communication", icon: <MessageSquare className="w-5 h-5" /> },
+    { name: "Tâches", href: "/dashboard/tasks", icon: <CheckSquare className="w-5 h-5" /> },
+    { name: "Temps", href: "/dashboard/time", icon: <Clock className="w-5 h-5" /> },
   ];
 
   const navsFooter = [
-    { name: "Aide", href: "/help", icon: <HelpCircle className="w-5 h-5" /> },
-    { name: "Paramètres", href: "/settings", icon: <Settings className="w-5 h-5" /> },
+    { name: "Aide", href: "/dashboard/help", icon: <HelpCircle className="w-5 h-5" /> },
+    { name: "Paramètres", href: "/dashboard/settings", icon: <Settings className="w-5 h-5" /> },
   ];
 
   return (

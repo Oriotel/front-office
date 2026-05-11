@@ -44,6 +44,8 @@ const useAuth = () => {
         navigate('/auth/2fa');
       } else if (requiresPasswordChange) {
         navigate('/auth/change-password');
+      } else if (result.payload.redirect) {
+        navigate(result.payload.redirect);
       } else {
         navigate('/dashboard');
       }

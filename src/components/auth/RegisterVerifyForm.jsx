@@ -24,6 +24,7 @@ const RegisterVerifyForm = () => {
 
   // If there's no registration pending, they shouldn't be on this page.
   const email = registrationEmail || localStorage.getItem('registration_email');
+  
   if (!email && registrationStatus !== 'success') {
     return <Navigate to="/register" replace />;
   }

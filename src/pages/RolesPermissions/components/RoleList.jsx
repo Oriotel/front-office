@@ -34,7 +34,7 @@ const RoleList = ({ roles, selectedRoles, onToggleRole, onAddRole, onDoubleClick
             >
               {/* Action Overlay (Hover) */}
               {!role.isStatic && (
-                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                <div className="absolute bottom-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();

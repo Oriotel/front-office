@@ -437,7 +437,11 @@ const RolesPermissionsPage = () => {
                 {selectedUsers.length > 0
                   ? selectedUsers.map(u => (
                     <span key={u.id} className="flex items-center gap-2 px-3 py-1 bg-primary/5 border border-primary/20 text-primary text-[10px] font-bold uppercase">
-                      <img src={u.avatar || ''} className="w-4 h-4 object-cover" alt="" />
+                      {u.avatar ? (
+                        <img src={u.avatar} className="w-4 h-4 object-cover" alt="" />
+                      ) : (
+                        <div className="w-4 h-4 bg-gray-200" />
+                      )}
                       {(u.name || 'Utilisateur').split(' ')[0]}
                     </span>
                   ))

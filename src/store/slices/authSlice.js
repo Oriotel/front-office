@@ -28,6 +28,9 @@ export const registerUser = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const response = await authService.register(data);
+      if (response.success === false) {
+        return rejectWithValue(response.message || 'Une erreur est survenue lors de l\'inscription');
+      }
       return response;
     } catch (error) {
       return rejectWithValue(error.message);

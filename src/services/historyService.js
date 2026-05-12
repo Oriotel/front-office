@@ -5,10 +5,9 @@ import api from './api';
  */
 const historyService = {
   getHistory: async (params = {}) => {
-    // api.js interceptor returns response.data
     const response = await api.get('api/v1/history', { params });
-    // If response is { data: [...] }, return response.data
-    return response.data ?? response;
+    // Return the whole response object so the page can handle data, meta, and links
+    return response;
   },
 
   getStats: async () => {

@@ -13,7 +13,9 @@ export const ACTION_TYPES = {
   communication: { label: 'Communication',   color: 'bg-sky-500/15     text-sky-400     border-sky-500/30'    },
   comptabilite:  { label: 'Comptabilité',    color: 'bg-yellow-500/15  text-yellow-400  border-yellow-500/30' },
   export:        { label: 'Export',          color: 'bg-pink-500/15    text-pink-400    border-pink-500/30'   },
-  modification:  { label: 'Modification',    color: 'bg-indigo-500/15  text-indigo-400  border-indigo-500/30' },
+  creation:      { label: 'Création',      color: 'bg-indigo-500/15  text-indigo-400  border-indigo-500/30' },
+  suppression:   { label: 'Suppression',   color: 'bg-rose-500/15    text-rose-400    border-rose-500/30'   },
+  modification:  { label: 'Modification',    color: 'bg-amber-500/15   text-amber-400   border-amber-500/30'  },
 };
 
 export const ROLES_COLORS = {

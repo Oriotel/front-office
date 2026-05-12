@@ -108,14 +108,23 @@ const UserRow = ({ user, isSelected, onToggle, roles, onAssignRole }) => {
       <td className="px-6 py-4">
         <div className="flex items-center gap-3">
           <div className="relative shrink-0">
-            <img
-              src={user.avatar}
-              alt={user.name}
-              className={clsx(
-                "w-8 h-8 object-cover border-2",
-                isSelected ? "border-primary" : "border-gray-200"
-              )}
-            />
+            {user.avatar ? (
+              <img
+                src={user.avatar}
+                alt={user.name}
+                className={clsx(
+                  "w-8 h-8 object-cover border-2",
+                  isSelected ? "border-primary" : "border-gray-200"
+                )}
+              />
+            ) : (
+              <div className={clsx(
+                "w-8 h-8 flex items-center justify-center font-bold text-xs bg-gray-100 border-2",
+                isSelected ? "border-primary text-primary" : "border-gray-200 text-gray-400"
+              )}>
+                {user.name?.charAt(0) || 'U'}
+              </div>
+            )}
             <div className={clsx(
               "absolute -bottom-1 -right-1 w-2.5 h-2.5 border-2 border-white",
               user.online ? "bg-green-500" : "bg-gray-300"

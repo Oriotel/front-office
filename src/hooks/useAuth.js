@@ -57,7 +57,7 @@ const useAuth = () => {
 
   const handleRegister = useCallback(async (data) => {
     const result = await dispatch(registerUser(data));
-    if (registerUser.fulfilled.match(result)) {
+    if (registerUser.fulfilled.match(result) && result.payload?.success !== false) {
       navigate('/register/verify');
     }
     return result;

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { 
   Users, 
   UserMinus, 
@@ -14,8 +16,14 @@ import {
   ChevronRight,
   MoreVertical,
   Calendar,
-  X
+  X,
+  FileText,
+  FileSpreadsheet,
+  FileCode,
+  CreditCard,
+  ChevronDown
 } from 'lucide-react';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 
 
 // --- Sub-components ---
@@ -43,40 +51,7 @@ const StatsCard = ({ icon: Icon, title, value, badge, badgeColor, borderColor, d
   </motion.div>
 );
 
-const FilterBar = () => (
-  <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-wrap gap-4 items-center justify-between mb-6 mt-8">
-    <div className="flex flex-wrap gap-4 items-center flex-1">
-      <div className="relative flex-1 min-w-[200px] max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-        <input 
-          type="text" 
-          placeholder="Rechercher un employé..." 
-          className="w-full pl-10 pr-4 py-2 bg-[#F9FAFB] border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1428C9]/20 focus:border-[#1428C9] transition-all text-sm"
-        />
-      </div>
-      <select className="bg-[#F9FAFB] border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#1428C9]/20">
-        <option>Statut: Tous</option>
-        <option>Présent</option>
-        <option>Retard</option>
-        <option>Absent</option>
-        <option>Incomplet</option>
-      </select>
-      <select className="bg-[#F9FAFB] border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#1428C9]/20">
-        <option>Rôle: Tous</option>
-        <option>Réception</option>
-        <option>Maintenance</option>
-        <option>Cuisine</option>
-      </select>
-      <div className="relative">
-        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-        <input 
-          type="date" 
-          className="pl-9 pr-4 py-2 bg-[#F9FAFB] border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#1428C9]/20"
-        />
-      </div>
-    </div>
-  </div>
-);
+// Removed old FilterBar component as it's now integrated into the main page flow
 
 const AttendanceRow = ({ data, index, onEdit }) => {
   const isLate = data.status === 'Retard';
@@ -250,6 +225,8 @@ const WorkTimeManagement = () => {
   const [activePeriod, setActivePeriod] = useState('Aujourd’hui');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedAttendance, setSelectedAttendance] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const periods = ['Aujourd’hui', 'Cette semaine', 'Ce mois', 'Personnalisé'];
 
@@ -298,8 +275,104 @@ const WorkTimeManagement = () => {
       total: "0h",
       status: "Absent",
       anomaly: "NON JUSTIFIÉ"
+    },
+    {
+      name: "Thomas Dubois",
+      role: "Maintenance",
+      date: "23/05/2024",
+      arrival: "08:30",
+      departure: "17:30",
+      total: "9h",
+      status: "Présent",
+      anomaly: null
+    },
+    {
+      name: "Julie Lefebvre",
+      role: "Cuisine",
+      date: "23/05/2024",
+      arrival: "07:55",
+      departure: "16:00",
+      total: "8h 05m",
+      status: "Présent",
+      anomaly: null
     }
   ];
+
+  // --- Export Logic ---
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text('Rapport de Temps de Travail - ORIOTEL', 14, 20);
+    doc.setFontSize(10);
+    doc.text(`Généré le : ${new Date().toLocaleString()}`, 14, 30);
+
+    autoTable(doc, {
+      startY: 40,
+      head: [['Employé', 'Rôle', 'Date', 'Arrivée', 'Départ', 'Total', 'Statut']],
+      body: mockData.map(row => [
+        row.name, row.role, row.date, row.arrival, row.departure, row.total, row.status
+      ]),
+      headStyles: { fillColor: [20, 40, 201] },
+    });
+
+    doc.save(`temps_travail_${activePeriod.toLowerCase().replace(' ', '_')}.pdf`);
+  };
+
+  const exportCSV = (format = 'csv') => {
+    const headers = ['Employé', 'Rôle', 'Date', 'Arrivée', 'Départ', 'Total', 'Statut', 'Anomalie'];
+    const rows = mockData.map(r => [
+      r.name, r.role, r.date, r.arrival, r.departure, r.total, r.status, r.anomaly || ''
+    ]);
+
+    let csvContent = "data:text/csv;charset=utf-8," 
+      + headers.join(",") + "\n"
+      + rows.map(e => e.join(",")).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `temps_travail_${new Date().getTime()}.${format === 'excel' ? 'csv' : 'csv'}`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const exportCardex = () => {
+    const doc = new jsPDF();
+    
+    mockData.forEach((emp, index) => {
+      if (index > 0) doc.addPage();
+      
+      doc.setFillColor(20, 40, 201);
+      doc.rect(0, 0, 210, 40, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(22);
+      doc.text('CARDEX EMPLOYÉ', 14, 25);
+      
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(16);
+      doc.text(emp.name, 14, 55);
+      doc.setFontSize(12);
+      doc.text(`Rôle: ${emp.role}`, 14, 65);
+      
+      autoTable(doc, {
+        startY: 75,
+        head: [['Champ', 'Valeur']],
+        body: [
+          ['Date', emp.date],
+          ['Heure Arrivée', emp.arrival],
+          ['Heure Départ', emp.departure],
+          ['Total Heures', emp.total],
+          ['Statut', emp.status],
+          ['Anomalies', emp.anomaly || 'Aucune']
+        ],
+        theme: 'striped',
+        headStyles: { fillColor: [20, 40, 201] },
+      });
+    });
+
+    doc.save(`cardex_complet_${new Date().getTime()}.pdf`);
+  };
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-12">
@@ -316,26 +389,41 @@ const WorkTimeManagement = () => {
           <p className="text-gray-500 font-medium">Suivi et gestion des pointages du personnel ORIOTEL.</p>
         </div>
 
-        <div className="flex items-center gap-4 bg-gray-100/50 p-1 rounded-xl">
-          <div className="flex p-1 bg-gray-200/50 rounded-lg">
-            {periods.map((period) => (
-              <button
-                key={period}
-                onClick={() => setActivePeriod(period)}
-                className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${
-                  activePeriod === period 
-                    ? 'bg-white text-[#1428C9] shadow-sm' 
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                {period}
+        <div className="flex items-center gap-3">
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild>
+              <button className="flex items-center gap-2 bg-[#1428C9] text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-[#0f1f9c] transition-all shadow-lg shadow-[#1428C9]/20 active:scale-95 group">
+                <Download size={18} className="group-hover:translate-y-0.5 transition-transform" />
+                Exporter
+                <ChevronDown size={14} className="opacity-60" />
               </button>
-            ))}
-          </div>
-          <button className="flex items-center gap-2 bg-[#1428C9] text-white px-5 py-2 rounded-lg font-bold text-sm hover:bg-[#0f1f9c] transition-all shadow-lg shadow-[#1428C9]/20 active:scale-95">
-            <Download size={16} />
-            Exporter
-          </button>
+            </DropdownMenu.Trigger>
+
+            <DropdownMenu.Portal>
+              <DropdownMenu.Content 
+                className="min-w-[200px] bg-white rounded-xl p-1.5 shadow-2xl border border-gray-100 z-[101] animate-in fade-in zoom-in duration-200" 
+                sideOffset={5}
+                align="end"
+              >
+                <DropdownMenu.Item onClick={exportCardex} className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-gray-700 outline-none hover:bg-blue-50 hover:text-blue-700 rounded-lg cursor-pointer transition-colors">
+                  <CreditCard size={16} className="text-blue-500" />
+                  Exporter en Cardex
+                </DropdownMenu.Item>
+                <DropdownMenu.Item onClick={exportPDF} className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-gray-700 outline-none hover:bg-red-50 hover:text-red-700 rounded-lg cursor-pointer transition-colors">
+                  <FileText size={16} className="text-red-500" />
+                  Exporter en PDF
+                </DropdownMenu.Item>
+                <DropdownMenu.Item onClick={() => exportCSV('csv')} className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-gray-700 outline-none hover:bg-green-50 hover:text-green-700 rounded-lg cursor-pointer transition-colors">
+                  <FileCode size={16} className="text-green-500" />
+                  Exporter en CSV
+                </DropdownMenu.Item>
+                <DropdownMenu.Item onClick={() => exportCSV('excel')} className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-gray-700 outline-none hover:bg-emerald-50 hover:text-emerald-700 rounded-lg cursor-pointer transition-colors">
+                  <FileSpreadsheet size={16} className="text-emerald-500" />
+                  Exporter pour Excel
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+          </DropdownMenu.Root>
         </div>
       </div>
 
@@ -379,8 +467,99 @@ const WorkTimeManagement = () => {
         />
       </div>
 
-      {/* Filter Bar */}
-      <FilterBar />
+      {/* Search & Period Filter Area */}
+      <div className="mt-8 mb-6 space-y-4">
+        <div className="flex flex-col md:flex-row gap-4 items-center">
+          {/* Search Bar */}
+          <div className="relative flex-1 group w-full">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-blue-500 transition-colors" />
+            <input
+              type="text" 
+              placeholder="Rechercher par employé..."
+              className="w-full pl-11 pr-10 py-3.5 bg-white border border-gray-200 rounded-xl text-sm outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-400 transition-all shadow-sm"
+              value={searchTerm} 
+              onChange={e => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            {/* Period Toggles */}
+            <div className="flex p-1.5 bg-white border border-gray-100 rounded-xl shadow-sm overflow-x-auto scrollbar-hide">
+              {periods.map((period) => (
+                <button
+                  key={period}
+                  onClick={() => setActivePeriod(period)}
+                  className={`px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
+                    activePeriod === period 
+                      ? 'bg-blue-50 text-[#1428C9] shadow-sm' 
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {period}
+                </button>
+              ))}
+            </div>
+
+            {/* Filter Toggle */}
+            <button
+              onClick={() => setShowFilters(v => !v)}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border transition-all ${showFilters ? 'bg-blue-50 border-blue-300 text-blue-700 shadow-sm' : 'bg-white border-gray-200 text-gray-600 hover:border-blue-300 shadow-sm'}`}
+            >
+              <Filter className="w-4 h-4" />
+              <span className="hidden sm:inline">Filtres</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Expanded Filters */}
+        <AnimatePresence>
+          {showFilters && (
+            <motion.div 
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-xl grid grid-cols-1 sm:grid-cols-3 gap-4 mb-2">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-600">Statut</label>
+                  <select className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500/20">
+                    <option>Tous les statuts</option>
+                    <option>Présent</option>
+                    <option>Retard</option>
+                    <option>Absent</option>
+                    <option>Incomplet</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-600">Rôle</label>
+                  <select className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500/20">
+                    <option>Tous les rôles</option>
+                    <option>Réception</option>
+                    <option>Maintenance</option>
+                    <option>Cuisine</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-600">Date spécifique</label>
+                  <div className="relative">
+                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                    <input 
+                      type="date" 
+                      className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* Attendance Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -399,7 +578,7 @@ const WorkTimeManagement = () => {
                 <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-50">
               {mockData.map((row, idx) => (
                 <AttendanceRow key={idx} data={row} index={idx} onEdit={handleEdit} />
               ))}
@@ -407,22 +586,13 @@ const WorkTimeManagement = () => {
           </table>
         </div>
 
-
-        {/* Pagination */}
-        <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+        {/* List Info Summary (Replaces Pagination) */}
+        <div className="px-6 py-6 border-t border-gray-50 flex items-center justify-between bg-gray-50/30">
           <p className="text-sm text-gray-500 font-medium">
-            Affichage de <span className="text-[#111827] font-bold">4</span> sur <span className="text-[#111827] font-bold">45</span> employés
+            Affichage de <span className="text-[#111827] font-black">{mockData.length}</span> résultats au total
           </p>
-          <div className="flex items-center gap-2">
-            <button className="p-2 border border-gray-200 rounded-lg text-gray-400 hover:bg-gray-50 transition-all">
-              <ChevronLeft size={18} />
-            </button>
-            <button className="w-9 h-9 bg-[#1428C9] text-white rounded-lg font-bold text-sm shadow-md shadow-[#1428C9]/20">1</button>
-            <button className="w-9 h-9 bg-white border border-gray-200 text-gray-600 rounded-lg font-bold text-sm hover:bg-gray-50 transition-all">2</button>
-            <button className="w-9 h-9 bg-white border border-gray-200 text-gray-600 rounded-lg font-bold text-sm hover:bg-gray-50 transition-all">3</button>
-            <button className="p-2 border border-gray-200 rounded-lg text-gray-400 hover:bg-gray-50 transition-all">
-              <ChevronRight size={18} />
-            </button>
+          <div className="text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+            Liste complète
           </div>
         </div>
       </div>

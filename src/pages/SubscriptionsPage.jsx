@@ -107,18 +107,40 @@ const SubscriptionsPage = () => {
 
   const handleFormSubmit = (formData) => {
     if (selectedItem) {
-      // Edit mode
-      setData(prev => prev.map(i => i.id === selectedItem.id ? { ...i, ...formData } : i));
+      // Edit mode — update contact.cin if a new CIN was extracted
+      setData(prev => prev.map(i =>
+        i.id === selectedItem.id
+          ? {
+              ...i,
+              operator: {
+                name:  formData.operator,
+                type:  formData.plan,
+                color: { IAM: '#EE1D23', Orange: '#FF6600', Inwi: '#722E85' }[formData.operator] || '#004595',
+              },
+              contact: {
+                ...i.contact,
+                cin: formData.cin || i.contact.cin,
+              },
+              documents: formData.documents || i.documents,
+            }
+          : i
+      ));
     } else {
       // Create mode
+      const initials = (formData.cin || 'NC').slice(0, 2).toUpperCase();
       const newItem = {
-        id: `SUB-2024-${Math.floor(1000 + Math.random() * 9000)}`,
-        client: { name: 'Nouveau Client', avatar: 'NC' },
-        contact: { phone: '...', cin: '...' },
-        address: '...',
-        operator: { name: formData.operator, type: formData.plan, color: '#004595' },
-        status: 'PENDING',
-        date: new Date().toISOString().split('T')[0]
+        id: `SUB-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+        client:    { name: 'Nouveau Client', avatar: initials },
+        contact:   { phone: '—', cin: formData.cin || '—' },
+        address:   '—',
+        operator:  {
+          name:  formData.operator,
+          type:  formData.plan,
+          color: { IAM: '#EE1D23', Orange: '#FF6600', Inwi: '#722E85' }[formData.operator] || '#004595',
+        },
+        status:    'PENDING',
+        date:      new Date().toISOString().split('T')[0],
+        documents: formData.documents || [],
       };
       setData(prev => [newItem, ...prev]);
     }
@@ -127,7 +149,7 @@ const SubscriptionsPage = () => {
   };
 
   const handleDeleteClick = (id) => {
-    if (window.confirm('Are you sure you want to delete this subscription?')) {
+    if (window.confirm('Supprimer cette souscription ?')) {
       setData(prev => prev.filter(i => i.id !== id));
     }
   };

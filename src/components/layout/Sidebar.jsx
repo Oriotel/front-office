@@ -39,7 +39,7 @@ const Sidebar = memo(({ isOpen, onClose }) => {
     { name: "Stock", href: "/dashboard/stock", icon: <Box className="w-5 h-5" /> },
     { name: "Communication", href: "/dashboard/communication", icon: <MessageSquare className="w-5 h-5" /> },
     { name: "Tâches", href: "/dashboard/tasks", icon: <CheckSquare className="w-5 h-5" /> },
-    { name: "Temps", href: "/dashboard/time", icon: <Clock className="w-5 h-5" /> },
+    { name: "Pointage", href: "/dashboard/time", icon: <Clock className="w-5 h-5" /> },
   ];
 
   const NAVS_FOOTER = [
